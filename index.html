@@ -3,2123 +3,2202 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Absen Archipelago</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <title>Absen Online Daily Worker</title>
   <script src="/_sdk/element_sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&amp;family=Bebas+Neue&amp;display=swap" rel="stylesheet">
   <style>
-    body { box-sizing: border-box; }
-    * { font-family: 'Poppins', sans-serif; }
-    
-    :root {
-      --bg-primary: #0a1628;
-      --bg-header: #1a2d4a;
-      --pink-bold: #ff1493;
-      --orange: #ff8c00;
+    body {
+      box-sizing: border-box;
     }
     
-    .bg-primary { background-color: var(--bg-primary); }
-    .bg-header { background-color: var(--bg-header); }
-    .text-orange { color: var(--orange); }
-    .bg-pink-bold { background-color: var(--pink-bold); }
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
     
+    .time-display {
+      font-family: 'Bebas Neue', sans-serif;
+    }
+    
+    .header-logo {
+      height: 40px;
+      margin-right: 12px;
+      filter: brightness(0) invert(1);
+    }
+    
+    .page {
+      display: none;
+    }
+    
+    .page.active {
+      display: block;
+    }
+    
+    /* Workers Grid System */
+    .workers-full-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    
+    /* Worker Card */
+    .worker-item {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 15px;
+      background: white;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .worker-item:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    /* Left Side - Photo & Name */
+    .worker-left-section {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .worker-avatar {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ff8c00, #ff1493);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .worker-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .worker-initials {
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+    
+    .worker-fullname {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #1e293b;
+      text-align: center;
+      line-height: 1.2;
+    }
+    
+    /* Right Side - Status & Buttons */
+    .worker-right-section {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .worker-status-box {
+      background: #f1f5f9;
+      padding: 5px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .status-label {
+      font-size: 9px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+    
+    .status-time {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 2px;
+    }
+    
+    /* Button Grid */
+    .worker-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    
+    .status-action-btn {
+      font-size: 8px;
+      padding: 6px 2px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: white;
+    }
+    
+    .btn-start {
+      background: #22c55e;
+    }
+    
+    .btn-start:hover {
+      background: #16a34a;
+    }
+    
+    .btn-finish {
+      background: #3b82f6;
+    }
+    
+    .btn-finish:hover {
+      background: #2563eb;
+    }
+    
+    .btn-break {
+      background: #f59e0b;
+    }
+    
+    .btn-break:hover {
+      background: #d97706;
+    }
+    
+    .btn-resume {
+      background: #8b5cf6;
+    }
+    
+    .btn-resume:hover {
+      background: #7c3aed;
+    }
+    
+    .sticky-column {
+      position: sticky;
+      left: 0;
+      background: #1e293b;
+      z-index: 10;
+    }
+    
+    .photo-thumbnail {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(255, 20, 147, 0.8);
+      }
+    }
+    
+    .worker-card.selected {
+      animation: pulse-glow 2s infinite;
+    }
+    
+    /* Status Selected - Pink Theme */
     .status-selected {
       background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%) !important;
-      border: 2px solid #fff !important;
-      box-shadow: 0 0 12px rgba(255, 20, 147, 0.5) !important;
-      transform: scale(1.02);
+      color: white !important;
+      border: 3px solid #ffffff !important;
+      box-shadow: 0 0 20px rgba(255, 20, 147, 0.8), 0 0 40px rgba(255, 20, 147, 0.4);
+      transform: scale(1.03);
+      transition: all 0.3s ease;
+      animation: pink-pulse 2s infinite;
     }
     
-    .card-worker { transition: all 0.3s ease; }
-    .card-worker:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+    .status-selected .worker-fullname {
+      color: white !important;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
     
-    .btn-status { transition: all 0.2s ease; }
-    .btn-status:hover { transform: scale(1.05); }
-    .btn-status:active { transform: scale(0.95); }
+    .status-selected .worker-status-box {
+      background: rgba(255, 255, 255, 0.25) !important;
+    }
     
-    .page { display: none; }
-    .page.active { display: flex; }
-    #page-login.active { display: flex; align-items: center; justify-content: center; }
-    #page-attendance.active, #page-recap.active, #page-calendar.active, 
-    #page-recap-detail.active, #page-photo-gallery.active, #page-photo-detail.active, 
-    #page-apps-script.active, #page-recap-jam.active { display: block; }
+    .status-selected .status-label {
+      color: white !important;
+      font-weight: 700;
+    }
     
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .fade-in { animation: fadeIn 0.3s ease-out; }
+    .status-selected .status-time {
+      color: #facc15 !important;
+      font-weight: 800;
+    }
     
-    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 20, 147, 0.7); } 50% { box-shadow: 0 0 0 8px rgba(255, 20, 147, 0); } }
-    .pulse-pink { animation: pulse 2s infinite; }
+    @keyframes pink-pulse {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 20, 147, 0.8), 0 0 40px rgba(255, 20, 147, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(255, 20, 147, 1), 0 0 60px rgba(255, 20, 147, 0.6);
+      }
+    }
     
-    .calendar-day { transition: all 0.2s ease; cursor: pointer; }
-    .calendar-day:hover { background-color: rgba(255, 140, 0, 0.4); transform: scale(1.05); }
-    .calendar-day.has-data { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
-    .calendar-day.today { ring: 2px; ring-color: #ff8c00; }
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
     
-    .gallery-folder { transition: all 0.3s ease; }
-    .gallery-folder:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .animate-fade-in {
+      animation: fade-in 0.6s ease-out;
+    }
     
-    .notification { animation: slideDown 0.3s ease-out; }
-    @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    /* Photo Gallery Styles */
+    .photo-thumbnail-container {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
     
-    .code-block { background: #1e1e1e; border-radius: 8px; overflow-x: auto; }
-    .code-block pre { margin: 0; padding: 16px; font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.4; color: #d4d4d4; }
+    .photo-thumbnail-container:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+    }
     
-    .copy-btn { transition: all 0.2s ease; }
-    .copy-btn:hover { background-color: #ff8c00; }
+    .photo-thumbnail-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
     
-    .worker-photo { object-fit: cover; border: 2px solid rgba(255,255,255,0.3); }
-    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    /* Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
     
-    .photo-thumbnail { position: relative; cursor: pointer; transition: transform 0.2s ease; }
-    .photo-thumbnail:hover { transform: scale(1.05); }
-    .photo-thumbnail .delete-btn { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; background: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; }
-    .photo-thumbnail:hover .delete-btn { opacity: 1; }
+    .lightbox-modal.active {
+      display: flex;
+    }
     
-    .fullscreen-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 100; display: flex; align-items: center; justify-content: center; }
-    .fullscreen-overlay img { max-width: 90%; max-height: 90%; object-fit: contain; }
+    .lightbox-content {
+      max-width: 90%;
+      max-height: 90vh;
+      position: relative;
+    }
     
-    .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s ease; }
-    .nav-arrow:hover { background: rgba(255,255,255,0.4); }
-    .nav-arrow.left { left: 20px; }
-    .nav-arrow.right { right: 20px; }
+    .lightbox-content img {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
     
-    .recap-table { width: 100%; border-collapse: collapse; }
-    .recap-table th, .recap-table td { border: 1px solid #334155; padding: 8px 12px; text-align: center; }
-    .recap-table th { background: #1e293b; color: #fff; font-weight: 600; position: sticky; top: 0; z-index: 10; }
-    .recap-table th.sticky-col { position: sticky; left: 0; z-index: 20; background: #1e293b; }
-    .recap-table td.sticky-col { position: sticky; left: 0; background: #0f172a; z-index: 5; }
-    .recap-table tr:nth-child(even) td { background: #1e293b; }
-    .recap-table tr:nth-child(even) td.sticky-col { background: #1e293b; }
-    .recap-table tr:nth-child(odd) td { background: #0f172a; }
+    .lightbox-close {
+      position: absolute;
+      top: -50px;
+      right: 0;
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
     
-    .logo-img { width: 100%; height: 100%; object-fit: cover; }
+    .lightbox-close:hover {
+      background: #dc2626;
+      transform: scale(1.05);
+    }
     
-    .nav-buttons { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 12px; flex-wrap: wrap; }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      color: white;
+      border: none;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
     
-    .status-card { cursor: pointer; transition: all 0.2s ease; }
-    .status-card:hover { transform: scale(1.03); opacity: 0.9; }
-    .status-card.clickable { cursor: pointer; }
+    .lightbox-nav:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-50%) scale(1.1);
+    }
     
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; }
-    .modal-content { background: #1e293b; border-radius: 16px; max-width: 500px; width: 100%; max-height: 80%; overflow-y: auto; }
-    .modal-header { padding: 16px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: #1e293b; z-index: 10; }
-    .modal-body { padding: 16px; }
+    .lightbox-nav.prev {
+      left: -80px;
+    }
     
-    .worker-list-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #0f172a; border-radius: 12px; margin-bottom: 8px; }
-    .worker-list-item img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
-    .worker-list-item .avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
-    
-    .jam-result-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-top: 16px; }
-    
-    .mini-loader { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .lightbox-nav.next {
+      right: -80px;
+    }
   </style>
   <style>@view-transition { navigation: auto; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
- <body class="h-full m-0 p-0 overflow-hidden bg-primary">
-  <div id="app" class="h-full w-full overflow-auto"><!-- NOTIFICATION -->
-   <div id="notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 notification">
-    <div class="bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2">
-     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-     </svg><span id="notification-text">Berhasil!</span>
+ <body class="h-full w-full bg-[#0a1628] text-white overflow-auto"><!-- HEADER (Hidden on Login Page) -->
+  <header id="main-header" class="sticky top-0 bg-[#1a2d4a] shadow-lg z-50 hidden">
+   <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <div class="flex items-center"><img src="https://drive.google.com/thumbnail?id=10un5eCNXYwHkgznim3T4lRMwICFWQ8Bw&amp;sz=w400" alt="Logo" class="header-logo" onerror="this.style.display='none';">
+     <h1 id="header-title" class="text-xl md:text-2xl font-bold uppercase">ABSEN ONLINE DAILY WORKER</h1>
     </div>
-   </div><!-- FULLSCREEN PHOTO VIEWER -->
-   <div id="fullscreen-viewer" class="fullscreen-overlay hidden" onclick="closeFullscreen(event)">
-    <div class="nav-arrow left" onclick="handleNavClick(-1, event)">
-     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-     </svg>
-    </div><img id="fullscreen-image" src="" alt="Preview" onclick="event.stopPropagation()">
-    <div class="nav-arrow right" onclick="handleNavClick(1, event)">
-     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-     </svg>
+    <div class="text-right">
+     <div id="current-date" class="text-sm md:text-base text-white"></div>
+     <div id="current-time" class="text-2xl md:text-4xl font-bold text-[#facc15] time-display"></div>
     </div>
-    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm"><span id="photo-counter">1 / 1</span>
-    </div>
-   </div><!-- STATUS MODAL -->
-   <div id="status-modal" class="modal-overlay hidden" onclick="closeStatusModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-     <div class="modal-header">
-      <h3 id="modal-title" class="text-white font-bold text-lg">Daftar Pekerja</h3><button onclick="closeStatusModal()" class="text-slate-400 hover:text-white">
-       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-       </svg></button>
+   </div>
+  </header><!-- PAGE: LOGIN -->
+  <div id="page-login" class="page active bg-[#0a1628]" style="min-height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+   <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-md animate-fade-in"><!-- Logo -->
+    <div class="flex justify-center mb-4"><img src="https://drive.google.com/thumbnail?id=10un5eCNXYwHkgznim3T4lRMwICFWQ8Bw&amp;sz=w400" alt="Logo" class="h-28 object-contain" style="border-radius: 12px;" onerror="this.style.display='none';">
+    </div><!-- Title -->
+    <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">ARCHIPELAGO ABSEN</h2>
+    <div class="space-y-4">
+     <div><label for="username" class="block text-sm font-semibold text-gray-700 mb-2">Username</label> <input type="text" id="username" class="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition">
      </div>
-     <div class="modal-body" id="modal-body"></div>
+     <div><label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Password</label> <input type="password" id="password" class="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+     </div><button id="btn-login" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-green-500/30 transition duration-300 transform hover:scale-[1.02]"> LOGIN </button>
+     <div id="login-error" class="text-red-600 text-sm text-center hidden"></div><!-- Setup Link -->
+     <div class="text-center mt-4"><button id="btn-to-setup" class="text-xs text-gray-500 underline hover:text-gray-700 cursor-pointer">⚙️ Setup Apps Script</button>
+     </div>
     </div>
-   </div><!-- SHARED HEADER COMPONENT -->
-   <header id="main-header" class="hidden bg-header p-4 sticky top-0 z-40 shadow-lg">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-     <div class="flex items-center gap-3">
-      <div id="header-logo" class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center"><img id="header-logo-img" class="w-full h-full object-contain brightness-0 invert" src="https://lh3.googleusercontent.com/d/10un5eCNXYwHkgznim3T4lRMwICFWQ8Bw" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');"> <span id="header-logo-fallback" class="hidden text-white text-2xl md:text-3xl font-bold">A</span>
-      </div>
+   </div>
+  </div><!-- PAGE: ATTENDANCE -->
+  <div id="page-attendance" class="page container mx-auto px-4 py-6">
+   <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center gap-2"><button id="btn-hadir-semua" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition"> Hadir Semua </button> <button id="btn-reset" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition"> Reset </button>
+    </div><button id="btn-to-recap" class="bg-[#ff8c00] hover:bg-[#e67e00] px-6 py-2 rounded-lg font-semibold transition"> Lihat Recap </button>
+   </div><!-- Grid Pekerja -->
+   <div id="workers-grid" class="workers-full-grid"><!-- Worker cards will be generated here -->
+   </div><!-- Upload Foto Absen Card -->
+   <div class="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 mt-8">
+    <div class="flex items-center justify-between mb-4">
+     <div>
+      <h3 class="text-2xl font-bold text-white">📸 Upload Foto Absen</h3>
+      <p class="text-sm text-gray-400 mt-1">(Max 10 Foto)</p>
+     </div><button id="btn-ambil-foto" class="bg-gradient-to-r from-[#22c55e] to-[#16a34a] hover:opacity-90 text-white font-bold px-8 py-4 rounded-xl text-lg transition transform hover:scale-105 shadow-lg shadow-green-500/30"> 📷 Ambil Foto </button>
+    </div><!-- Photo Gallery Grid -->
+    <div id="photo-gallery" class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6"><!-- Photo thumbnails will appear here -->
+    </div>
+   </div><!-- Hidden Camera Input --> <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;"> <!-- Hidden Canvas for Watermark Processing -->
+   <canvas id="watermark-canvas" style="display: none;"></canvas><!-- Tombol Kirim Absen -->
+   <div class="mt-6"><button id="btn-kirim-absen" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-xl text-xl transition transform hover:scale-[1.02] shadow-lg shadow-green-500/30 flex items-center justify-center gap-3">
+     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+     </svg><span>KIRIM ABSEN</span> </button> <!-- Status Pengiriman -->
+    <div id="send-status" class="hidden mt-4 p-4 rounded-lg"></div>
+   </div>
+  </div><!-- PAGE: RECAP MENU -->
+  <div id="page-recap" class="page container mx-auto px-4 py-6"><button id="btn-back-from-recap" class="bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-lg font-semibold mb-6 transition"> ← Kembali </button>
+   <h2 class="text-3xl font-bold mb-8 text-center">Menu Laporan</h2>
+   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto"><button id="btn-recap-today" class="bg-[#1e293b] hover:bg-[#2d3f5b] border-4 border-[#22c55e] rounded-2xl p-8 transition transform hover:scale-105">
+     <div class="text-5xl mb-4">
+      📊
+     </div><h3 class="text-2xl font-bold">Recap Hari Ini</h3><p class="text-gray-400 mt-2">Lihat absensi hari ini</p></button> <button id="btn-recap-date" class="bg-[#1e293b] hover:bg-[#2d3f5b] border-4 border-[#3b82f6] rounded-2xl p-8 transition transform hover:scale-105">
+     <div class="text-5xl mb-4">
+      📅
+     </div><h3 class="text-2xl font-bold">Pilih Tanggal</h3><p class="text-gray-400 mt-2">Pilih tanggal spesifik</p></button> <button id="btn-recap-jam" class="bg-[#06b6d4] hover:bg-[#0891b2] border-4 border-[#06b6d4] rounded-2xl p-8 transition transform hover:scale-105">
+     <div class="text-5xl mb-4">
+      ⏱️
+     </div><h3 class="text-2xl font-bold">Total Jam Kerja</h3><p class="text-gray-400 mt-2">Hitung jam kerja pekerja</p></button>
+   </div>
+  </div><!-- PAGE: RECAP DETAIL (Table) -->
+  <div id="page-recap-detail" class="page container mx-auto px-4 py-6">
+   <div class="flex justify-between items-center mb-6"><button id="btn-back-from-detail" class="bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-lg font-semibold transition"> ← Kembali </button>
+    <div><input type="date" id="date-picker" class="bg-[#1e293b] border border-[#334155] px-4 py-2 rounded-lg">
+    </div>
+   </div>
+   <h2 class="text-2xl font-bold mb-4">Tabel Absensi</h2>
+   <div class="bg-[#1e293b] rounded-xl overflow-x-auto">
+    <table class="w-full text-sm">
+     <thead>
+      <tr class="bg-[#1e3a5f] text-[#facc15]">
+       <th class="sticky-column px-4 py-3 text-left font-bold">Nama</th>
+       <th class="px-4 py-3 font-bold">00:00</th>
+       <th class="px-4 py-3 font-bold">01:00</th>
+       <th class="px-4 py-3 font-bold">02:00</th>
+       <th class="px-4 py-3 font-bold">03:00</th>
+       <th class="px-4 py-3 font-bold">04:00</th>
+       <th class="px-4 py-3 font-bold">05:00</th>
+       <th class="px-4 py-3 font-bold">06:00</th>
+       <th class="px-4 py-3 font-bold">07:00</th>
+       <th class="px-4 py-3 font-bold">08:00</th>
+       <th class="px-4 py-3 font-bold">09:00</th>
+       <th class="px-4 py-3 font-bold">10:00</th>
+       <th class="px-4 py-3 font-bold">11:00</th>
+       <th class="px-4 py-3 font-bold">12:00</th>
+       <th class="px-4 py-3 font-bold">13:00</th>
+       <th class="px-4 py-3 font-bold">14:00</th>
+       <th class="px-4 py-3 font-bold">15:00</th>
+       <th class="px-4 py-3 font-bold">16:00</th>
+       <th class="px-4 py-3 font-bold">17:00</th>
+       <th class="px-4 py-3 font-bold">18:00</th>
+       <th class="px-4 py-3 font-bold">19:00</th>
+       <th class="px-4 py-3 font-bold">20:00</th>
+       <th class="px-4 py-3 font-bold">21:00</th>
+       <th class="px-4 py-3 font-bold">22:00</th>
+       <th class="px-4 py-3 font-bold">23:00</th>
+      </tr>
+     </thead>
+     <tbody id="recap-table-body"><!-- Table rows will be generated here -->
+     </tbody>
+    </table>
+   </div>
+  </div><!-- PAGE: RECAP JAM (Work Hours Calculator) -->
+  <div id="page-recap-jam" class="page container mx-auto px-4 py-6"><button id="btn-back-from-jam" class="bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-lg font-semibold mb-6 transition"> ← Kembali </button>
+   <h2 class="text-2xl font-bold mb-6">Hitung Total Jam Kerja</h2>
+   <div class="mb-6"><input type="text" id="search-worker" placeholder="Cari nama pekerja..." class="w-full bg-[#1e293b] border border-[#334155] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff1493]">
+   </div>
+   <div id="worker-result" class="hidden"><!-- Worker profile card -->
+    <div class="bg-[#1e293b] rounded-xl p-6 mb-6">
+     <div class="flex items-center gap-4"><img id="result-worker-photo" src="" alt="Photo" class="w-24 h-24 rounded-full object-cover">
       <div>
-       <h1 id="header-title" class="text-lg md:text-2xl font-bold text-white">ABSEN ONLINE DAILY WORKER</h1>
+       <h3 id="result-worker-name" class="text-2xl font-bold"></h3>
+       <p class="text-gray-400">Total Jam Kerja: <span id="total-hours" class="text-[#22c55e] font-bold text-xl">0</span> jam</p>
       </div>
      </div>
-     <div class="text-right">
-      <p id="header-date" class="text-white text-xs md:text-sm font-medium"></p>
-      <div class="flex items-center justify-end gap-1">
-       <p id="header-time" class="text-yellow-400 text-base md:text-xl font-bold"></p><span id="timezone-badge" class="text-yellow-400 text-base md:text-xl font-bold"></span>
-      </div>
-     </div>
+    </div><!-- Work sessions list -->
+    <div class="space-y-4" id="sessions-list"><!-- Sessions will be generated here -->
     </div>
-   </header><!-- PAGE 1: LOGIN -->
-   <div id="page-login" class="page active h-full w-full" style="display: flex; align-items: center; justify-content: center; min-height: 100%;">
-    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden fade-in" style="width: 100%; max-width: 400px;">
-     <div class="flex flex-col items-center justify-center p-8 text-center">
-      <div class="mb-2">
-       <div id="login-logo" class="w-32 h-32 md:w-40 md:h-40 mx-auto flex items-center justify-center"><img id="login-logo-img" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/d/10un5eCNXYwHkgznim3T4lRMwICFWQ8Bw" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');"> <span id="login-logo-fallback" class="hidden text-slate-800 text-6xl font-bold">A</span>
-       </div>
-      </div>
-      <h1 id="login-company-name" class="text-xl font-bold text-slate-800 mb-4 text-center" style="margin-top: -8px;">ABSEN ARCHIPELAGO</h1>
-      <form id="login-form" class="w-full space-y-3">
-       <div><label for="username" class="block text-left text-slate-600 text-xs font-medium mb-1">Username</label> <input type="text" id="username" placeholder="Masukkan username" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-300 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm" required>
-       </div>
-       <div><label for="password" class="block text-left text-slate-600 text-xs font-medium mb-1">Password</label> <input type="password" id="password" placeholder="Masukkan password" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-300 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm" required>
-       </div>
-       <p id="login-error" class="hidden text-red-500 text-xs"></p><button type="submit" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-green-500/30 text-sm">Login</button>
-      </form><button onclick="showPage('page-apps-script')" class="mt-3 text-slate-400 hover:text-green-500 text-xs underline transition-colors">⚙️ Setup Apps Script</button>
+   </div>
+  </div><!-- PAGE: SETUP APPS SCRIPT -->
+  <div id="page-setup" class="page container mx-auto px-4 py-6 max-w-4xl">
+   <div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-bold">⚙️ Setup Apps Script</h2><button id="btn-back-from-setup" class="bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-lg font-semibold transition"> ← Kembali </button>
+   </div><!-- Step 1: Apps Script Code -->
+   <div class="bg-[#1e293b] border border-[#334155] rounded-2xl p-6 mb-6">
+    <div class="flex items-center gap-3 mb-4">
+     <div class="bg-[#22c55e] text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg">
+      1
      </div>
+     <h3 class="text-xl font-bold">Copy Kode Apps Script</h3>
     </div>
-   </div><!-- PAGE 2: MAIN ATTENDANCE -->
-   <div id="page-attendance" class="page min-h-full">
-    <main class="p-3 max-w-7xl mx-auto">
-     <div class="flex flex-wrap items-center gap-2 mb-3"><button onclick="setAllPresent()" class="px-3 py-1.5 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg transition-all flex items-center gap-1 font-medium text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-       </svg> Hadir Semua </button> <button onclick="resetAllStatus()" class="px-3 py-1.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all flex items-center gap-1 font-medium text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-       </svg> Reset </button>
-      <div class="flex-1"></div><button onclick="showPage('page-recap')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-       </svg> Recap </button> <button onclick="showPage('page-apps-script')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-       </svg> Script </button>
-     </div>
-     <div id="search-container" class="hidden mb-3">
-      <div class="flex gap-2 items-stretch">
-       <div class="relative flex-1">
-        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg><input type="text" id="search-input" placeholder="Cari nama..." class="w-full h-full pl-9 pr-8 py-2 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"> <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white">
-         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-         </svg></button>
-       </div>
-       <div class="flex items-center gap-2 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs">
-        <div class="flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> <span id="counter-selected" class="text-green-600 font-semibold">0</span>
-        </div>
-        <div class="w-px h-4 bg-slate-300"></div>
-        <div class="flex items-center gap-1"><span class="w-2 h-2 bg-red-500 rounded-full"></span> <span id="counter-unselected" class="text-red-500 font-semibold">0</span>
-        </div>
-       </div>
-      </div>
-     </div>
-     <div id="loading-workers" class="text-center py-12">
-      <div class="inline-block w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-slate-400 mt-4 text-sm">Memuat data pekerja...</p>
-     </div>
-     <div id="workers-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-4"></div>
-     <div id="search-results" class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-4"></div>
-     <div id="photo-section" class="hidden mb-4">
-      <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-3 shadow-lg">
-       <div class="flex items-center justify-between mb-2">
-        <p class="text-slate-300 text-sm font-semibold">Upload foto absen</p><span id="photo-count-badge" class="hidden px-2 py-0.5 bg-orange-500 text-white text-xs rounded-full">0 foto</span>
-       </div>
-       <div class="flex items-center gap-2"><label class="flex-1 cursor-pointer"> <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoUpload(event)">
-         <div class="py-2 bg-slate-700/70 hover:bg-slate-600 border border-slate-600 text-white rounded-lg transition-all flex items-center justify-center gap-2 font-medium text-sm">
-          <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg><span>Ambil Foto</span>
-         </div></label>
-       </div>
-       <div id="photo-thumbnails" class="hidden mt-3 grid grid-cols-4 gap-2"></div>
-       <div id="location-status" class="mt-2 text-xs text-slate-400 flex items-center gap-1">
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg><span id="location-text">Mengambil lokasi...</span>
-       </div>
-      </div>
-     </div>
-     <div id="submit-section" class="hidden"><button id="submit-btn" onclick="submitAttendance()" class="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold text-sm rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-md shadow-green-500/30 border border-green-400/30"> <span class="inline-flex items-center gap-2">
-        <svg class="w-4 h-4 transform rotate-[-35deg]" fill="currentColor" viewbox="0 0 24 24">
-         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-        </svg> Kirim Absensi </span> </button>
-     </div>
-     <div id="no-script-warning" class="hidden bg-amber-500/20 border border-amber-500/50 rounded-xl p-3 text-center">
-      <p class="text-amber-400 text-sm">Apps Script URL belum diatur.</p><button onclick="showPage('page-apps-script')" class="mt-2 text-orange-400 hover:text-orange-300 underline text-sm">Setup Apps Script</button>
-     </div>
-    </main>
-   </div><!-- PAGE 3: RECAP MENU -->
-   <div id="page-recap" class="page min-h-full bg-primary">
-    <main class="p-3 max-w-7xl mx-auto">
-     <div class="nav-buttons"><button onclick="showPage('page-attendance')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-       </svg> Kembali </button> <button onclick="showPage('page-attendance')" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-       </svg> Home </button>
-     </div>
-     <h2 class="text-xl md:text-2xl font-bold text-white text-center mb-4">RECAP ABSEN DAILY WORKER</h2>
-     <div class="flex flex-row gap-3 overflow-x-auto pb-2"><button onclick="showRecapToday()" class="flex-1 min-w-[140px] bg-white p-4 rounded-xl text-center hover:shadow-xl transition-all shadow-lg border border-slate-200">
-       <div class="flex flex-col items-center gap-2">
-        <div class="w-12 h-12 bg-blue-900/10 rounded-lg flex items-center justify-center">
-         <svg class="w-6 h-6 text-blue-900" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-         </svg>
-        </div>
-        <div>
-         <h2 class="text-xs md:text-sm font-bold text-blue-900">Recap Hari Ini</h2>
-        </div>
-       </div></button> <button onclick="showPage('page-calendar')" class="flex-1 min-w-[140px] bg-white p-4 rounded-xl text-center hover:shadow-xl transition-all shadow-lg border border-slate-200">
-       <div class="flex flex-col items-center gap-2">
-        <div class="w-12 h-12 bg-blue-900/10 rounded-lg flex items-center justify-center">
-         <svg class="w-6 h-6 text-blue-900" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-         </svg>
-        </div>
-        <div>
-         <h2 class="text-xs md:text-sm font-bold text-blue-900">Recap Berdasarkan Tanggal</h2>
-        </div>
-       </div></button> <button onclick="showPage('page-photo-gallery')" class="flex-1 min-w-[140px] bg-white p-4 rounded-xl text-center hover:shadow-xl transition-all shadow-lg border border-slate-200">
-       <div class="flex flex-col items-center gap-2">
-        <div class="w-12 h-12 bg-blue-900/10 rounded-lg flex items-center justify-center">
-         <svg class="w-6 h-6 text-blue-900" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-         </svg>
-        </div>
-        <div>
-         <h2 class="text-xs md:text-sm font-bold text-blue-900">Recap Foto Absen</h2>
-        </div>
-       </div></button>
-     </div>
-    </main>
-   </div><!-- PAGE 4: CALENDAR -->
-   <div id="page-calendar" class="page min-h-full bg-primary">
-    <main class="p-3 max-w-md mx-auto">
-     <div class="nav-buttons"><button onclick="showPage('page-recap')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-       </svg> Kembali </button> <button onclick="showPage('page-attendance')" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-       </svg> Home </button>
-     </div>
-     <div class="bg-slate-800/70 rounded-2xl p-4 shadow-xl border border-slate-700">
-      <div class="flex items-center justify-between mb-4"><button onclick="prevMonth()" class="p-2 hover:bg-slate-700 rounded-full transition-colors text-white">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg></button>
-       <h2 id="calendar-month" class="text-base font-bold text-white"></h2><button onclick="nextMonth()" class="p-2 hover:bg-slate-700 rounded-full transition-colors text-white">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg></button>
-      </div>
-      <div class="grid grid-cols-7 gap-1 mb-2">
-       <div class="text-center text-slate-500 text-[10px] font-semibold py-1">
-        MIN
-       </div>
-       <div class="text-center text-slate-500 text-[10px] font-semibold py-1">
-        SEN
-       </div>
-       <div class="text-center text-slate-500 text-[10px] font-semibold py-1">
-        SEL
-       </div>
-       <div class="text-center text-slate-500 text-[10px] font-semibold py-1">
-        RAB
-       </div>
-       <div class="text-center text-slate-500 text-[10px] font-semibold py-1">
-        KAM
-       </div>
-       <div class="text-center text-slate-500 text-[10px] font-semibold py-1">
-        JUM
-       </div>
-       <div class="text-center text-slate-500 text-[10px] font-semibold py-1">
-        SAB
-       </div>
-      </div>
-      <div id="calendar-days" class="grid grid-cols-7 gap-1"></div>
-      <div id="calendar-loading" class="hidden text-center py-4">
-       <div class="inline-block w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-     </div>
-    </main>
-   </div><!-- PAGE 5: RECAP DETAIL -->
-   <div id="page-recap-detail" class="page min-h-full bg-primary">
-    <main class="p-3 max-w-7xl mx-auto">
-     <div class="flex justify-between items-center mb-3"><button onclick="showRecapJam()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-       </svg> Recap Jam </button>
-      <div class="flex gap-2"><button id="recap-back-btn" onclick="goBackFromRecapDetail()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg> Kembali </button> <button onclick="showPage('page-attendance')" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg> Home </button>
-      </div>
-     </div>
-     <div class="mb-3 flex items-center justify-between">
-      <div>
-       <h2 id="recap-title" class="text-lg md:text-xl font-bold text-white">Recap Absen</h2>
-       <p id="recap-date-label" class="text-yellow-400 text-sm font-medium"></p>
-      </div><button id="download-pdf-btn" onclick="downloadRecapPDF()" class="hidden px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-       </svg> Download PDF </button>
-     </div>
-     <div id="recap-loading" class="text-center py-8">
-      <div class="inline-block w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-slate-400 mt-3 text-sm">Memuat data...</p>
-     </div>
-     <div id="recap-content" class="hidden"></div>
-     <div id="recap-empty" class="hidden text-center py-12">
-      <div class="text-5xl mb-3">
-       📭
-      </div>
-      <p class="text-slate-400 text-sm">Tidak ada data absensi untuk tanggal ini</p>
-     </div>
-    </main>
-   </div><!-- PAGE 6: PHOTO GALLERY -->
-   <div id="page-photo-gallery" class="page min-h-full bg-primary">
-    <main class="p-3 max-w-4xl mx-auto">
-     <div class="nav-buttons"><button onclick="showPage('page-recap')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-       </svg> Kembali </button> <button onclick="showPage('page-attendance')" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-       </svg> Home </button>
-     </div>
-     <h2 class="text-lg md:text-xl font-bold text-white mb-3">Galeri Foto</h2>
-     <div id="gallery-loading" class="text-center py-8">
-      <div class="inline-block w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-slate-400 mt-3 text-sm">Memuat galeri...</p>
-     </div>
-     <div id="gallery-folders" class="hidden grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2"></div>
-     <div id="gallery-empty" class="hidden text-center py-12">
-      <div class="text-5xl mb-3">
-       📷
-      </div>
-      <p class="text-slate-400 text-sm">Belum ada foto absen</p>
-     </div>
-    </main>
-   </div><!-- PAGE 7: PHOTO DETAIL -->
-   <div id="page-photo-detail" class="page min-h-full bg-primary">
-    <main class="p-3 max-w-4xl mx-auto">
-     <div class="nav-buttons"><button onclick="showPage('page-photo-gallery')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-       </svg> Kembali </button> <button onclick="showPage('page-attendance')" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-       </svg> Home </button>
-     </div>
-     <div class="mb-3">
-      <h2 class="text-lg md:text-xl font-bold text-white">Foto Absen</h2>
-      <p id="photo-folder-date" class="text-yellow-400 text-sm font-medium"></p>
-     </div>
-     <div id="photo-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"></div>
-     <div id="photos-empty" class="hidden text-center py-12">
-      <div class="text-5xl mb-3">
-       📷
-      </div>
-      <p class="text-slate-400 text-sm">Tidak ada foto</p>
-     </div>
-    </main>
-   </div><!-- PAGE 8: APPS SCRIPT SETUP -->
-   <div id="page-apps-script" class="page min-h-full bg-primary">
-    <main class="p-3 max-w-4xl mx-auto">
-     <div class="nav-buttons"><button onclick="goBackFromAppsScript()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-       </svg> Kembali </button> <button onclick="goBackFromAppsScript()" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-       </svg> Home </button>
-     </div>
-     <h2 class="text-lg md:text-xl font-bold text-white mb-4">Setup Apps Script</h2>
-     <div class="space-y-4">
-      <div class="bg-slate-800/50 rounded-xl p-3 md:p-4 border border-slate-700">
-       <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><span class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-xs">1</span> Paste URL Apps Script</h3>
-       <div class="flex gap-2"><input type="url" id="script-url-input" placeholder="https://script.google.com/macros/s/..." class="flex-1 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"> <button onclick="saveScriptUrl()" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-all text-sm">Simpan</button>
-       </div>
-       <p id="script-url-status" class="mt-2 text-xs"></p>
-      </div>
-      <div class="bg-slate-800/50 rounded-xl p-3 md:p-4 border border-slate-700">
-       <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2"><span class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-xs">2</span> Copy Kode Apps Script</h3>
-       <p class="text-yellow-400 text-xs mb-2">⚠️ PENTING: Update Apps Script dengan kode ini, lalu Deploy ulang!</p>
-       <div class="relative"><button onclick="copyScript()" class="copy-btn absolute top-2 right-2 px-2 py-1 bg-slate-600 hover:bg-orange-500 text-white text-xs rounded transition-all z-10">Copy</button>
-        <div class="code-block max-h-64 overflow-y-auto">
-         <pre id="apps-script-code">// ABSEN ARCHIPELAGO - Google Apps Script v3
-const SPREADSHEET_ID = '1FllBcwBjTr_jfPylhyWwHt6ZE16j6fJpSa0C9hYEw44';
-const SHEET_WORKERS = 'Form responses 1';
-const SHEET_ABSEN = 'Absen recap';
-const FOLDER_PHOTOS = '1CJ46h8M89mzc3XKEg-4hJPV-2voMN3OD';
+    <p class="text-gray-300 mb-4">Copy kode di bawah ini dan paste ke Google Apps Script Editor:</p>
+    <div class="bg-[#0f172a] rounded-xl p-4 relative"><button id="btn-copy-script" class="absolute top-4 right-4 bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-2 rounded-lg font-semibold transition flex items-center gap-2"> <span>📋</span> <span id="copy-text">Copy</span> </button>
+     <pre id="apps-script-code" class="text-sm text-gray-300 overflow-x-auto pr-24" style="max-height: 600px;"><code>// Spreadsheet ID dari URL Anda
+const SPREADSHEET_ID = '1ktMqdAoIOrBT6ViqGWwJRRZpjuB6I4nPOkSPeziMyDY';
 
-const COLORS = {
-  'Start Work': '#22c55e',
-  'Finish Work': '#3b82f6',
-  'Sakit': '#f97316',
-  'Standby': '#a855f7'
-};
+// Drive Folder ID untuk menyimpan foto
+const DRIVE_FOLDER_ID = '1CJ46h8M89mzc3XKEg-4hJPV-2voMN3OD';
 
 function doGet(e) {
   const action = e.parameter.action;
-  try {
-    if (action === 'getWorkers') return jsonResponse(getWorkers());
-    if (action === 'getAttendance') return jsonResponse(getAttendance(e.parameter.date));
-    if (action === 'getPhotos') return jsonResponse(getPhotos(e.parameter.date));
-    if (action === 'getPhotoFolders') return jsonResponse(getPhotoFolders());
-    if (action === 'getMonthData') return jsonResponse(getMonthData(e.parameter.month, e.parameter.year));
-    return jsonResponse({ error: 'Invalid action' });
-  } catch (error) { return jsonResponse({ error: error.message }); }
+  
+  if (action === 'getWorkers') {
+    return getWorkers();
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify({
+    status: 'error',
+    message: 'Invalid action'
+  })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
   try {
-    let data;
-    if (e.parameter &amp;&amp; e.parameter.data) {
-      data = JSON.parse(e.parameter.data);
-    } else if (e.postData &amp;&amp; e.postData.contents) {
-      data = JSON.parse(e.postData.contents);
-    } else {
-      return jsonResponse({ error: 'No data received' });
+    const data = JSON.parse(e.postData.contents);
+    
+    if (!data.tanggal || !data.jam || !data.workers) {
+      throw new Error('Data tidak lengkap');
     }
-    if (data.action === 'submitAttendance') return jsonResponse(submitAttendance(data));
-    if (data.action === 'uploadPhoto') return jsonResponse(uploadPhoto(data));
-    return jsonResponse({ error: 'Invalid action' });
-  } catch (error) { return jsonResponse({ error: error.message }); }
-}
-
-function jsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+    
+    // Submit attendance
+    submitAttendance(data);
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'success',
+      message: 'Absensi berhasil dikirim'
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error',
+      message: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 function getWorkers() {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_WORKERS);
-  if (!sheet) return { success: false, error: 'Sheet tidak ditemukan!', workers: [] };
-  const data = sheet.getDataRange().getValues();
-  const workers = [];
-  for (let i = 1; i &lt; data.length; i++) {
-    const nama = data[i][1], foto = data[i][2];
-    if (nama &amp;&amp; nama.toString().trim() !== '') {
-      workers.push({ id: i, name: nama.toString().trim(), photo: foto ? foto.toString().trim() : '' });
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName('Workers');
+    
+    if (!sheet) {
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'error',
+        message: 'Sheet "Workers" tidak ditemukan'
+      })).setMimeType(ContentService.MimeType.JSON);
     }
+    
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    const workers = rows.map(row =&gt; {
+      return {
+        name: row[1],
+        photo: row[2]
+      };
+    });
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'success',
+      data: workers
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error',
+      message: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
   }
-  return { success: true, workers: workers };
-}
-
-function syncWorkersToAbsenSheet() {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const workersSheet = ss.getSheetByName(SHEET_WORKERS);
-  let absenSheet = ss.getSheetByName(SHEET_ABSEN);
-  
-  if (!absenSheet) {
-    absenSheet = ss.insertSheet(SHEET_ABSEN);
-  }
-  
-  const workersData = workersSheet.getDataRange().getValues();
-  const currentWorkers = [];
-  for (let i = 1; i &lt; workersData.length; i++) {
-    const nama = workersData[i][1];
-    if (nama &amp;&amp; nama.toString().trim() !== '') {
-      currentWorkers.push(nama.toString().trim());
-    }
-  }
-  
-  const lastRow = absenSheet.getLastRow();
-  const existingWorkers = [];
-  if (lastRow &gt;= 3) {
-    const existingData = absenSheet.getRange(3, 1, lastRow - 2, 1).getValues();
-    for (let i = 0; i &lt; existingData.length; i++) {
-      if (existingData[i][0]) existingWorkers.push(existingData[i][0].toString().trim());
-    }
-  }
-  
-  let nextRow = lastRow &gt;= 3 ? lastRow + 1 : 3;
-  currentWorkers.forEach(worker =&gt; {
-    if (!existingWorkers.includes(worker)) {
-      absenSheet.getRange(nextRow, 1).setValue(worker);
-      nextRow++;
-    }
-  });
-  
-  return currentWorkers;
 }
 
 function submitAttendance(data) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  let sheet = ss.getSheetByName(SHEET_ABSEN);
+  let sheet = ss.getSheetByName('Attendance');
   
-  syncWorkersToAbsenSheet();
-  sheet = ss.getSheetByName(SHEET_ABSEN);
+  // Create sheet if not exists
+  if (!sheet) {
+    sheet = ss.insertSheet('Attendance');
+  }
   
-  const lastCol = sheet.getLastColumn();
-  const newCol = lastCol &lt; 1 ? 2 : lastCol + 1;
+  // Parse tanggal
+  const dateParts = data.tanggal.split('/');
+  const day = parseInt(dateParts[0]);
+  const month = parseInt(dateParts[1]);
+  const year = parseInt(dateParts[2]);
   
-  sheet.getRange(1, newCol).setValue(data.tanggal);
-  sheet.getRange(2, newCol).setValue(data.jam);
+  // Determine row color based on odd/even date
+  const dateColor = (day % 2 === 1) ? '#cccccc' : '#ffffff';
   
-  const lastRow = sheet.getLastRow();
-  if (lastRow &gt;= 3) {
-    const workerNames = sheet.getRange(3, 1, lastRow - 2, 1).getValues();
-    
-    const statusMap = {};
-    data.attendance.forEach(item =&gt; {
-      statusMap[item.name.trim()] = item.status;
-    });
-    
-    for (let i = 0; i &lt; workerNames.length; i++) {
-      const workerName = workerNames[i][0].toString().trim();
-      const status = statusMap[workerName] || '-';
-      const cell = sheet.getRange(3 + i, newCol);
-      cell.setValue(status);
-      if (COLORS[status]) {
-        cell.setBackground(COLORS[status]).setFontColor('#ffffff');
+  // Find or create column for this date
+  const lastColumn = sheet.getLastColumn();
+  let targetColumn = -1;
+  
+  // Check if date already exists
+  if (lastColumn &gt; 0) {
+    const firstRow = sheet.getRange(1, 1, 1, lastColumn).getValues()[0];
+    for (let i = 0; i &lt; firstRow.length; i++) {
+      if (firstRow[i] == data.tanggal) {
+        targetColumn = i + 1;
+        break;
       }
     }
   }
   
-  return { success: true, message: 'Absensi berhasil disimpan!' };
-}
-
-function getAttendance(searchDate) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_ABSEN);
-  if (!sheet) return { success: true, data: [] };
-  
-  const allData = sheet.getDataRange().getValues();
-  if (allData.length &lt; 3) return { success: true, data: [] };
-  
-  const results = [];
-  
-  function normalizeDate(d) {
-    if (!d) return '';
-    if (d instanceof Date) {
-      return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
-    }
-    return d.toString().trim();
-  }
-  
-  function formatDateFromSheet(d) {
-    if (!d) return '';
-    if (d instanceof Date) {
-      return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
-    }
-    return d.toString().trim();
-  }
-  
-  function formatTimeFromSheet(t) {
-    if (!t) return '';
-    if (t instanceof Date) {
-      const h = t.getHours().toString().padStart(2, '0');
-      const m = t.getMinutes().toString().padStart(2, '0');
-      return h + ':' + m;
-    }
-    return t.toString().trim();
-  }
-  
-  const normalizedSearch = normalizeDate(searchDate);
-  
-  for (let col = 1; col &lt; allData[0].length; col++) {
-    const cellDate = normalizeDate(allData[0][col]);
+  // Create new column if date doesn't exist
+  if (targetColumn === -1) {
+    targetColumn = lastColumn + 1;
     
-    if (cellDate === normalizedSearch) {
-      const tanggalDisplay = formatDateFromSheet(allData[0][col]);
-      const jam = formatTimeFromSheet(allData[1][col]);
-      const workers = [];
-      
-      for (let row = 2; row &lt; allData.length; row++) {
-        const workerName = allData[row][0];
-        if (workerName &amp;&amp; workerName.toString().trim() !== '') {
-          workers.push({
-            name: workerName.toString().trim(),
-            status: allData[row][col] ? allData[row][col].toString() : '-'
-          });
-        }
-      }
-      
-      if (workers.length &gt; 0) {
-        results.push({ tanggal: tanggalDisplay, jam: jam, workers: workers });
-      }
-    }
-  }
-  
-  return { success: true, data: results };
-}
-
-function getMonthData(month, year) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_ABSEN);
-  if (!sheet) return { success: true, data: {} };
-  
-  const allData = sheet.getDataRange().getValues();
-  if (allData.length &lt; 3) return { success: true, data: {} };
-  
-  const monthInt = parseInt(month);
-  const yearInt = parseInt(year);
-  const dateCounts = {};
-  
-  function getDateParts(d) {
-    if (!d) return null;
-    if (d instanceof Date) {
-      return { day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() };
-    }
-    const parts = d.toString().trim().split('/');
-    if (parts.length === 3) {
-      return { day: parseInt(parts[0]), month: parseInt(parts[1]), year: parseInt(parts[2]) };
-    }
-    return null;
-  }
-  
-  for (let col = 1; col &lt; allData[0].length; col++) {
-    const parts = getDateParts(allData[0][col]);
-    if (parts &amp;&amp; parts.month === monthInt &amp;&amp; parts.year === yearInt) {
-      const key = parts.day;
-      dateCounts[key] = (dateCounts[key] || 0) + 1;
-    }
-  }
-  
-  return { success: true, data: dateCounts };
-}
-
-function uploadPhoto(data) {
-  const parentFolder = DriveApp.getFolderById(FOLDER_PHOTOS);
-  const folderName = data.tanggal.replace(/\//g, '-');
-  
-  let dateFolder;
-  const folders = parentFolder.getFoldersByName(folderName);
-  if (folders.hasNext()) {
-    dateFolder = folders.next();
+    // Set date (row 1)
+    const dateCell = sheet.getRange(1, targetColumn);
+    dateCell.setValue(data.tanggal);
+    dateCell.setBackground(dateColor);
+    dateCell.setFontWeight('bold');
+    dateCell.setHorizontalAlignment('center');
+    
+    // Set time (row 2)
+    const timeCell = sheet.getRange(2, targetColumn);
+    timeCell.setValue(data.jam);
+    timeCell.setBackground('#f3f3f3');
+    timeCell.setHorizontalAlignment('center');
   } else {
-    dateFolder = parentFolder.createFolder(folderName);
+    // Update time in existing column
+    sheet.getRange(2, targetColumn).setValue(data.jam);
   }
   
-  const base64Data = data.photo.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
-  const blob = Utilities.newBlob(Utilities.base64Decode(base64Data), 'image/jpeg', 'foto_' + data.jam.replace(/:/g, '-') + '_' + data.index + '.jpg');
-  dateFolder.createFile(blob);
-  
-  return { success: true };
-}
-
-function getPhotoFolders() {
-  try {
-    const parentFolder = DriveApp.getFolderById(FOLDER_PHOTOS);
-    const folders = parentFolder.getFolders();
-    const folderList = [];
+  // Write worker data starting from row 3
+  data.workers.forEach((worker, index) =&gt; {
+    const row = index + 3;
     
-    while (folders.hasNext()) {
-      const folder = folders.next();
-      folderList.push(folder.getName());
+    // Set worker name in column A if not exists
+    if (sheet.getRange(row, 1).getValue() === '') {
+      sheet.getRange(row, 1).setValue(worker.name);
+      sheet.getRange(row, 1).setFontWeight('bold');
     }
     
-    folderList.sort((a, b) =&gt; {
-      const dateA = a.split('-').reverse().join('-');
-      const dateB = b.split('-').reverse().join('-');
-      return dateB.localeCompare(dateA);
+    // Set status with color
+    const statusCell = sheet.getRange(row, targetColumn);
+    statusCell.setValue(worker.status);
+    statusCell.setHorizontalAlignment('center');
+    
+    // Apply color based on status
+    let bgColor = '#ffffff';
+    switch (worker.color) {
+      case 'green':
+        bgColor = '#00ff00';
+        break;
+      case 'blue':
+        bgColor = '#0000ff';
+        break;
+      case 'orange':
+        bgColor = '#ffa500';
+        break;
+      case 'purple':
+        bgColor = '#800080';
+        break;
+      case 'red':
+        bgColor = '#ff0000';
+        break;
+    }
+    
+    statusCell.setBackground(bgColor);
+    
+    // Set text color to white for better readability
+    if (worker.color !== 'white') {
+      statusCell.setFontColor('#ffffff');
+      statusCell.setFontWeight('bold');
+    }
+  });
+  
+  // Upload photos to Drive
+  if (data.photos &amp;&amp; data.photos.length &gt; 0) {
+    uploadPhotosToDrive(data.photos, data.tanggal);
+  }
+  
+  // Auto-resize columns
+  sheet.autoResizeColumns(1, targetColumn);
+}
+
+function uploadPhotosToDrive(photos, tanggal) {
+  try {
+    const parentFolder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+    
+    // Create or get subfolder with date
+    const folderName = tanggal.replace(/\//g, '-');
+    let dateFolder;
+    
+    const folders = parentFolder.getFoldersByName(folderName);
+    if (folders.hasNext()) {
+      dateFolder = folders.next();
+    } else {
+      dateFolder = parentFolder.createFolder(folderName);
+    }
+    
+    // Upload each photo
+    photos.forEach((photoBase64, index) =&gt; {
+      try {
+        // Remove data URL prefix
+        const base64Data = photoBase64.split(',')[1];
+        
+        // Decode base64
+        const blob = Utilities.newBlob(
+          Utilities.base64Decode(base64Data),
+          'image/jpeg',
+          `Absen_${index + 1}_${new Date().getTime()}.jpg`
+        );
+        
+        // Save to folder
+        dateFolder.createFile(blob);
+        
+      } catch (photoError) {
+        Logger.log('Error uploading photo ' + index + ': ' + photoError.toString());
+      }
     });
     
-    return { success: true, folders: folderList };
+    Logger.log('Successfully uploaded ' + photos.length + ' photos to folder: ' + folderName);
+    
   } catch (error) {
-    return { success: false, error: error.message, folders: [] };
+    Logger.log('Error in uploadPhotosToDrive: ' + error.toString());
   }
-}
-
-function getPhotos(date) {
-  try {
-    const parentFolder = DriveApp.getFolderById(FOLDER_PHOTOS);
-    const folderName = date.replace(/\//g, '-');
-    const folders = parentFolder.getFoldersByName(folderName);
-    
-    if (!folders.hasNext()) {
-      return { success: true, photos: [] };
-    }
-    
-    const dateFolder = folders.next();
-    const files = dateFolder.getFiles();
-    const photos = [];
-    
-    while (files.hasNext()) {
-      const file = files.next();
-      if (file.getMimeType().startsWith('image/')) {
-        photos.push({
-          name: file.getName(),
-          url: 'https://lh3.googleusercontent.com/d/' + file.getId(),
-          id: file.getId()
-        });
-      }
-    }
-    
-    return { success: true, photos: photos };
-  } catch (error) {
-    return { success: false, error: error.message, photos: [] };
-  }
-}</pre>
-        </div>
-       </div>
-      </div>
+}</code></pre>
+    </div>
+    <div class="mt-4 bg-[#0f172a] border border-[#facc15] rounded-lg p-4">
+     <p class="text-[#facc15] font-semibold mb-2">💡 Petunjuk:</p>
+     <ul class="text-sm text-gray-300 space-y-1 list-disc list-inside">
+      <li>Buka Google Sheets Anda</li>
+      <li>Klik <strong>Extensions → Apps Script</strong></li>
+      <li>Hapus kode default, paste kode di atas</li>
+      <li>Klik <strong>Deploy → New deployment</strong></li>
+      <li>Pilih type: <strong>Web app</strong></li>
+      <li>Execute as: <strong>Me</strong></li>
+      <li>Who has access: <strong>Anyone</strong></li>
+      <li>Copy URL yang muncul</li>
+     </ul>
+    </div>
+   </div><!-- Step 2: Sheet Format -->
+   <div class="bg-[#1e293b] border border-[#334155] rounded-2xl p-6 mb-6">
+    <div class="flex items-center gap-3 mb-4">
+     <div class="bg-[#ff8c00] text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg">
+      2
      </div>
-    </main>
-   </div><!-- PAGE 9: RECAP JAM KERJA -->
-   <div id="page-recap-jam" class="page min-h-full bg-primary">
-    <main class="p-3 max-w-2xl mx-auto">
-     <div class="nav-buttons"><button onclick="showPage('page-recap-detail')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-       </svg> Kembali </button> <button onclick="showPage('page-attendance')" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all flex items-center gap-1 text-xs">
-       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-       </svg> Home </button>
+     <h3 class="text-xl font-bold">Format Google Sheets</h3>
+    </div>
+    <p class="text-gray-300 mb-4">Pastikan Sheet bernama <strong>"Workers"</strong> dengan format:</p>
+    <div class="bg-[#0f172a] rounded-xl p-4 overflow-x-auto">
+     <table class="w-full text-sm">
+      <thead>
+       <tr class="border-b border-gray-600">
+        <th class="px-4 py-2 text-left text-[#22c55e]">A</th>
+        <th class="px-4 py-2 text-left text-[#22c55e]">B</th>
+        <th class="px-4 py-2 text-left text-[#22c55e]">C</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr class="border-b border-gray-700">
+        <td class="px-4 py-2 text-[#facc15] font-bold">id</td>
+        <td class="px-4 py-2 text-[#facc15] font-bold">name</td>
+        <td class="px-4 py-2 text-[#facc15] font-bold">photo</td>
+       </tr>
+       <tr class="border-b border-gray-700">
+        <td class="px-4 py-2">1</td>
+        <td class="px-4 py-2">John Doe</td>
+        <td class="px-4 py-2 text-xs">https://drive.google.com/file/d/...</td>
+       </tr>
+       <tr class="border-b border-gray-700">
+        <td class="px-4 py-2">2</td>
+        <td class="px-4 py-2">Jane Smith</td>
+        <td class="px-4 py-2 text-xs">https://drive.google.com/file/d/...</td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+    <div class="mt-4 bg-[#0f172a] border border-[#3b82f6] rounded-lg p-4">
+     <p class="text-[#3b82f6] font-semibold mb-2">📌 Catatan:</p>
+     <ul class="text-sm text-gray-300 space-y-1 list-disc list-inside">
+      <li>Kolom A: <strong>id</strong> (nomor urut pekerja)</li>
+      <li>Kolom B: <strong>name</strong> (nama pekerja)</li>
+      <li>Kolom C: <strong>photo</strong> (link Google Drive foto)</li>
+      <li>Row 1 HARUS header: <strong>id | name | photo</strong></li>
+      <li>Sheet HARUS bernama <strong>"Workers"</strong> (huruf W besar)</li>
+     </ul>
+    </div>
+   </div><!-- Step 3: Paste URL -->
+   <div class="bg-[#1e293b] border border-[#334155] rounded-2xl p-6">
+    <div class="flex items-center gap-3 mb-4">
+     <div class="bg-[#ff1493] text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg">
+      3
      </div>
-     <div class="text-center mb-4">
-      <h2 class="text-xl md:text-2xl font-bold text-white">Recap Jam Kerja Worker</h2>
-      <p id="recap-jam-date" class="text-yellow-400 text-sm font-medium mt-1"></p>
-     </div>
-     <div class="relative mb-4">
-      <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg><input type="text" id="jam-search-input" placeholder="Cari nama pekerja..." class="w-full pl-10 pr-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm">
-     </div>
-     <div id="jam-search-results" class="space-y-2 max-h-48 overflow-y-auto mb-4"></div>
-     <div id="jam-result-container" class="hidden">
-      <div class="jam-result-card">
-       <div class="flex items-center gap-3 mb-4">
-        <div id="jam-worker-photo" class="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-xl font-bold"></div>
-        <div>
-         <h3 id="jam-worker-name" class="text-white font-bold text-lg"></h3>
-         <p class="text-slate-400 text-sm">Detail Jam Kerja</p>
-        </div>
-       </div>
-       <div id="jam-sessions" class="space-y-2 mb-4"></div>
-       <div class="border-t border-slate-600 pt-4">
-        <div class="flex justify-between items-center"><span class="text-slate-400 font-medium">Total Jam Kerja:</span> <span id="jam-total" class="text-2xl font-bold text-cyan-400"></span>
-        </div>
-       </div>
-      </div>
-     </div>
-     <div id="jam-no-result" class="hidden text-center py-8">
-      <div class="text-4xl mb-2">
-       🔍
-      </div>
-      <p class="text-slate-400 text-sm">Ketik nama untuk mencari data jam kerja</p>
-     </div>
-    </main>
+     <h3 class="text-xl font-bold">Paste URL Apps Script</h3>
+    </div>
+    <p class="text-gray-300 mb-4">Paste URL deployment dari Apps Script Anda:</p>
+    <div class="mb-4"><label class="block text-sm font-semibold text-gray-300 mb-2">Apps Script URL:</label> <input type="text" id="apps-script-url" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" class="w-full bg-[#0f172a] border border-[#334155] px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff1493] text-white">
+    </div><button id="btn-save-url" class="w-full bg-gradient-to-r from-[#ff8c00] to-[#ff1493] hover:opacity-90 text-white font-bold py-4 rounded-xl text-lg transition"> 💾 SIMPAN &amp; TEST KONEKSI </button>
+    <div id="test-result" class="mt-4 hidden"></div>
+   </div>
+  </div><!-- Lightbox Modal -->
+  <div id="lightbox-modal" class="lightbox-modal">
+   <div class="lightbox-content"><button class="lightbox-close" id="lightbox-close">✕ Close</button> <button class="lightbox-nav prev" id="lightbox-prev">‹</button> <img id="lightbox-image" src="" alt="Full size photo"> <button class="lightbox-nav next" id="lightbox-next">›</button>
    </div>
   </div>
   <script>
-    const LOGO_URL = 'https://lh3.googleusercontent.com/d/10un5eCNXYwHkgznim3T4lRMwICFWQ8Bw';
-    
+    // Config
     const defaultConfig = {
       app_title: 'ABSEN ONLINE DAILY WORKER',
-      company_name: 'ABSEN ARCHIPELAGO',
-      logo_url: LOGO_URL
+      login_username: 'archipelago',
+      login_password: 'balivibes'
     };
 
-    let config = { ...defaultConfig };
+    // Workers data (will be loaded from Google Sheets)
     let workers = [];
-    let attendanceStatus = {};
-    let uploadedPhotos = [];
-    let currentPhotoIndex = 0;
-    let currentCalendarDate = new Date();
-    let isLoggedIn = false;
-    let currentRecapDate = '';
-    let currentRecapData = [];
-    let recapSource = 'today'; // 'today' or 'calendar'
-    let calendarDataCache = {};
-    const SAVED_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbydsNAiAuO9sM6wi63B8hxSkX93gg2EjrxHnP8nsnRiIRk2i-IbunhTgp8Is2ApwXFVHw/exec';
-    let scriptUrl = localStorage.getItem('appsScriptUrl') || SAVED_SCRIPT_URL;
-    let cachedLocation = null;
-    let cachedAddress = null;
+    let appsScriptUrl = localStorage.getItem('appsScriptUrl') || 'https://script.google.com/macros/s/AKfycby8PVX_YKlSsKVVjUUERHoq52cl-jj9VHsCmcb5WOmaSmjvRsChZipnlBQccbDhbV9L/exec';
 
-    // Store status workers for modal (unique per person)
-    window.currentStatusWorkers = { 'Start Work': [], 'Finish Work': [], 'Sakit': [], 'Standby': [], 'Belum Absen': [] };
-    
-    // Gallery photo viewer
-    let galleryPhotos = [];
-    let currentGalleryIndex = 0;
-
-    function requestLocationPermission() {
-      if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            cachedLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
-            fetchAddress(cachedLocation.lat, cachedLocation.lng);
-            updateLocationStatus('success');
-          },
-          (error) => { updateLocationStatus('error'); setTimeout(requestLocationPermission, 3000); },
-          { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
-        );
-      }
-    }
-
-    async function fetchAddress(lat, lng) {
-      try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-        const data = await response.json();
-        if (data && data.display_name) {
-          cachedAddress = data.display_name;
-          updateLocationStatus('success');
-        }
-      } catch (error) {}
-    }
-
-    function updateLocationStatus(status) {
-      const locationText = document.getElementById('location-text');
-      if (locationText) {
-        if (status === 'success' && cachedAddress) {
-          const shortAddress = cachedAddress.length > 50 ? cachedAddress.substring(0, 50) + '...' : cachedAddress;
-          locationText.textContent = shortAddress;
-          locationText.classList.remove('text-red-400');
-          locationText.classList.add('text-green-400');
-        } else {
-          locationText.textContent = 'Mengambil lokasi...';
-        }
-      }
-    }
-
+    // Convert Google Drive link to direct image link
     function convertDriveLink(url) {
-      if (!url) return '';
-      if (url.includes('lh3.googleusercontent.com')) return url;
-      let match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (match) return `https://lh3.googleusercontent.com/d/${match[1]}`;
-      match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if (match) return `https://lh3.googleusercontent.com/d/${match[1]}`;
+      if (!url || url.trim() === '') return '';
+      
+      if (url.includes('drive.google.com')) {
+        let fileId = '';
+        
+        if (url.includes('/file/d/')) {
+          fileId = url.split('/file/d/')[1].split('/')[0];
+        }
+        else if (url.includes('open?id=')) {
+          fileId = url.split('open?id=')[1].split('&')[0];
+        }
+        else if (url.includes('uc?id=')) {
+          fileId = url.split('uc?id=')[1].split('&')[0];
+        }
+        else if (url.includes('id=')) {
+          fileId = url.split('id=')[1].split('&')[0];
+        }
+        
+        if (fileId) {
+          return `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
+        }
+      }
+      
       return url;
     }
 
-    function updateAllLogos() {
-      const logoUrl = config.logo_url || LOGO_URL;
-      const convertedUrl = convertDriveLink(logoUrl);
-      
-      const logoElements = ['login-logo-img', 'header-logo-img'];
-      
-      logoElements.forEach(id => {
-        const img = document.getElementById(id);
-        if (img) {
-          img.src = convertedUrl;
-          img.style.display = '';
-          const fallback = img.nextElementSibling;
-          if (fallback) fallback.classList.add('hidden');
-        }
-      });
+    // Get initials from name for placeholder
+    function getInitials(name) {
+      if (!name) return '?';
+      const parts = name.trim().split(' ');
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+      return name[0].toUpperCase();
     }
 
+    // Load workers from cache instantly
+    function loadCachedWorkers() {
+      try {
+        const cached = localStorage.getItem('cached_workers');
+        if (cached) {
+          const cachedData = JSON.parse(cached);
+          workers = cachedData;
+          generateWorkerCards();
+          return true;
+        }
+      } catch (error) {
+        console.error('Error loading cache:', error);
+      }
+      return false;
+    }
+
+    // Save workers to cache
+    function saveWorkersToCache(workersData) {
+      try {
+        localStorage.setItem('cached_workers', JSON.stringify(workersData));
+      } catch (error) {
+        console.error('Error saving cache:', error);
+      }
+    }
+
+    // Fetch workers data from Google Sheets (silent background update)
+    async function fetchWorkers(silent = false) {
+      if (!silent) {
+        const grid = document.getElementById('workers-grid');
+        grid.innerHTML = '<div class="col-span-full text-center text-gray-400">⏳ Memuat data pekerja...</div>';
+      }
+      
+      try {
+        console.log('Fetching workers data from:', appsScriptUrl);
+        const response = await fetch(`${appsScriptUrl}?action=getWorkers`);
+        
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (data.status === 'success' && data.data && Array.isArray(data.data)) {
+          console.log('Workers count:', data.data.length);
+          
+          const newWorkers = data.data.map((worker, index) => ({
+            id: index + 1,
+            name: worker.name || 'Unnamed Worker',
+            photo: convertDriveLink(worker.photo) || '',
+            initials: getInitials(worker.name || 'Unnamed Worker')
+          }));
+          
+          console.log('Workers mapped:', newWorkers);
+          
+          // Save to cache
+          saveWorkersToCache(newWorkers);
+          
+          // Update workers array
+          workers = newWorkers;
+          
+          // Generate worker cards
+          generateWorkerCards();
+          
+          if (!silent) {
+            showToast(`✅ ${workers.length} pekerja berhasil dimuat`);
+          }
+        } else {
+          console.error('Invalid data format:', data);
+          if (!silent) {
+            const grid = document.getElementById('workers-grid');
+            grid.innerHTML = '<div class="col-span-full text-center text-red-400">❌ Format data tidak valid.</div>';
+            showToast('❌ Gagal memuat data pekerja');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching workers:', error);
+        if (!silent) {
+          const grid = document.getElementById('workers-grid');
+          grid.innerHTML = `<div class="col-span-full text-center text-red-400">❌ Error: ${error.message}</div>`;
+          showToast('❌ Tidak dapat terhubung ke server');
+        }
+      }
+    }
+
+    // Initialize app with instant cache loading
+    function initApp() {
+      const hasCachedData = loadCachedWorkers();
+      
+      if (hasCachedData) {
+        console.log('✅ Loaded from cache instantly');
+        // Update from server in background (silent)
+        fetchWorkers(true);
+      } else {
+        console.log('No cache found, fetching from server...');
+        const grid = document.getElementById('workers-grid');
+        grid.innerHTML = '<div class="col-span-full text-center text-gray-400">⏳ Memuat data pekerja...</div>';
+        fetchWorkers(false);
+      }
+    }
+
+    // State
+    let selectedWorkers = new Set();
+    let capturedPhotos = [];
+    let currentLocation = { lat: null, lng: null };
+    let attendanceData = {};
+    let workSessions = {};
+    let selectedCards = {}; // Track which cards are selected (pink state)
+    let attendancePhotos = []; // Store photos with watermark
+    let currentLightboxIndex = 0;
+
+    // Navigation
     function showPage(pageId) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
       document.getElementById(pageId).classList.add('active');
       
-      const mainHeader = document.getElementById('main-header');
-      if (pageId === 'page-login') {
-        mainHeader.classList.add('hidden');
+      const header = document.getElementById('main-header');
+      if (pageId === 'page-login' || pageId === 'page-setup') {
+        header.classList.add('hidden');
       } else {
-        mainHeader.classList.remove('hidden');
-      }
-      
-      if (pageId === 'page-attendance') {
-        if (workers.length > 0) {
-          renderWorkers(workers);
-          updateCounter();
-          document.getElementById('loading-workers').classList.add('hidden');
-          document.getElementById('workers-grid').classList.remove('hidden');
-          document.getElementById('search-container').classList.remove('hidden');
-          document.getElementById('photo-section').classList.remove('hidden');
-          document.getElementById('submit-section').classList.remove('hidden');
-        } else {
-          loadWorkers();
-        }
-        updateDateTime();
-      } else if (pageId === 'page-calendar') {
-        renderCalendar();
-      } else if (pageId === 'page-photo-gallery') {
-        loadPhotoFolders();
-      } else if (pageId === 'page-apps-script') {
-        document.getElementById('script-url-input').value = scriptUrl;
-        updateScriptUrlStatus();
-      } else if (pageId === 'page-recap-jam') {
-        document.getElementById('recap-jam-date').textContent = currentRecapDate;
-        document.getElementById('jam-search-input').value = '';
-        document.getElementById('jam-search-results').innerHTML = '';
-        document.getElementById('jam-result-container').classList.add('hidden');
-        document.getElementById('jam-no-result').classList.remove('hidden');
+        header.classList.remove('hidden');
       }
     }
 
-    function goBackFromAppsScript() {
-      if (isLoggedIn) showPage('page-attendance');
-      else showPage('page-login');
-    }
-
-    function goBackFromRecapDetail() {
-      if (recapSource === 'calendar') {
-        showPage('page-calendar');
-      } else {
-        showPage('page-recap');
-      }
-    }
-
-    document.getElementById('login-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      
-      if (username === 'archipelago' && password === 'balivibes') {
-        isLoggedIn = true;
-        document.getElementById('page-login').style.display = 'none';
-        showPage('page-attendance');
-      } else {
-        const errorEl = document.getElementById('login-error');
-        errorEl.textContent = 'Username atau password salah!';
-        errorEl.classList.remove('hidden');
-      }
-    });
-
-    function getTimezone() {
-      const offset = new Date().getTimezoneOffset();
-      if (offset === -420) return 'WIB';
-      if (offset === -480) return 'WITA';
-      if (offset === -540) return 'WIT';
-      return 'WIB';
-    }
-
-    function updateDateTime() {
+    // Real-time clock
+    function updateClock() {
       const now = new Date();
-      const dateStr = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-      const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
       
-      const dateEl = document.getElementById('header-date');
-      const timeEl = document.getElementById('header-time');
-      const tzEl = document.getElementById('timezone-badge');
-      if (dateEl) dateEl.textContent = dateStr;
-      if (timeEl) timeEl.textContent = timeStr;
-      if (tzEl) tzEl.textContent = getTimezone();
+      const dayName = days[now.getDay()];
+      const date = now.getDate();
+      const month = months[now.getMonth()];
+      const year = now.getFullYear();
+      
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+      document.getElementById('current-date').textContent = `${dayName}, ${date} ${month} ${year}`;
+      document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds} WIB`;
     }
-    
-    setInterval(updateDateTime, 1000);
 
-    async function loadWorkers() {
-      const loadingEl = document.getElementById('loading-workers');
-      const gridEl = document.getElementById('workers-grid');
-      const searchContainer = document.getElementById('search-container');
-      const photoSection = document.getElementById('photo-section');
-      const submitSection = document.getElementById('submit-section');
-      const noScriptWarning = document.getElementById('no-script-warning');
-
-      if (!scriptUrl) {
-        loadingEl.classList.add('hidden');
-        noScriptWarning.classList.remove('hidden');
+    // Generate worker cards
+    function generateWorkerCards() {
+      const grid = document.getElementById('workers-grid');
+      grid.innerHTML = '';
+      
+      if (workers.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #94a3b8;">Memuat data pekerja...</div>';
         return;
       }
-
-      noScriptWarning.classList.add('hidden');
-      loadingEl.classList.remove('hidden');
-      gridEl.classList.add('hidden');
-
-      try {
-        const data = await fetchWithCallback(`${scriptUrl}?action=getWorkers`);
-        
-        if (data.success && data.workers) {
-          workers = data.workers;
-          renderWorkers(workers);
-          updateCounter();
-          
-          loadingEl.classList.add('hidden');
-          gridEl.classList.remove('hidden');
-          searchContainer.classList.remove('hidden');
-          photoSection.classList.remove('hidden');
-          submitSection.classList.remove('hidden');
-        } else {
-          throw new Error(data.error || 'Failed to load workers');
-        }
-      } catch (error) {
-        loadingEl.innerHTML = `
-          <div class="text-red-400 text-center">
-            <p class="text-base mb-2">Gagal memuat data</p>
-            <p class="text-xs mb-3 text-slate-400">${error.message}</p>
-            <button onclick="loadWorkers()" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm">Coba Lagi</button>
-          </div>
-        `;
-      }
-    }
-
-    async function fetchWithCallback(url) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-      try {
-        const response = await fetch(url, { method: 'GET', redirect: 'follow', signal: controller.signal });
-        clearTimeout(timeoutId);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const text = await response.text();
-        return JSON.parse(text);
-      } catch (error) {
-        clearTimeout(timeoutId);
-        if (error.name === 'AbortError') throw new Error('Koneksi timeout.');
-        throw error;
-      }
-    }
-
-    function renderWorkers(workerList, container = 'workers-grid') {
-      const grid = document.getElementById(container);
-      grid.innerHTML = '';
-
-      workerList.forEach(worker => {
-        const status = attendanceStatus[worker.id] || '';
-        const isSelected = status !== '';
-        
+      
+      workers.forEach(worker => {
         const card = document.createElement('div');
-        card.className = `card-worker bg-white rounded-xl p-3 border-2 ${isSelected ? 'status-selected' : 'border-slate-200'}`;
-        card.dataset.workerId = worker.id;
         
-        const photoUrl = convertDriveLink(worker.photo);
+        // Add status-selected class if card is selected
+        const isSelected = selectedCards[worker.id];
+        card.className = isSelected ? 'worker-item status-selected' : 'worker-item';
         
-        let photoHtml = '';
-        if (photoUrl && photoUrl.startsWith('http')) {
-          photoHtml = `<img src="${photoUrl}" alt="${worker.name}" class="w-20 h-20 rounded-full worker-photo mx-auto" onerror="this.outerHTML='<div class=\\'w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center text-white text-xl font-bold mx-auto\\'>${worker.name.charAt(0).toUpperCase()}</div>'">`;
+        let photoHTML = '';
+        if (worker.photo && worker.photo.trim() !== '') {
+          const fallbackUrl = worker.photo.replace('/thumbnail?', '/uc?export=view&').replace('&sz=w400', '');
+          
+          photoHTML = `
+            <div class="worker-avatar">
+              <img src="${worker.photo}" 
+                   alt="${worker.name}"
+                   onerror="console.error('Failed to load image:', this.src); this.src='${fallbackUrl}'; this.onerror=function() { this.style.display='none'; this.parentElement.innerHTML='<div class=\\'worker-initials\\'>${worker.initials}</div>'; };">
+            </div>
+          `;
         } else {
-          photoHtml = `<div class="w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center text-white text-xl font-bold mx-auto">${worker.name.charAt(0).toUpperCase()}</div>`;
+          photoHTML = `
+            <div class="worker-avatar">
+              <div class="worker-initials">${worker.initials}</div>
+            </div>
+          `;
+        }
+        
+        const sessions = workSessions[worker.id] || [];
+        const lastSession = sessions[sessions.length - 1];
+        const currentAction = selectedCards[worker.id];
+        
+        let statusText = 'Belum Dipilih';
+        let statusTime = '';
+        
+        // Prioritize showing current selected action
+        if (currentAction === 'start') {
+          statusText = 'START WORK';
+          statusTime = lastSession?.start || '';
+        } else if (currentAction === 'finish') {
+          statusText = 'SELESAI';
+          statusTime = lastSession?.finish || '';
+        } else if (currentAction === 'break') {
+          statusText = 'ISTIRAHAT';
+          statusTime = lastSession?.break || '';
+        } else if (currentAction === 'resume') {
+          statusText = 'LANJUT KERJA';
+          statusTime = lastSession?.resume || '';
+        } else if (lastSession) {
+          // Fallback to session data if no selection
+          if (lastSession.finish) {
+            statusText = 'SELESAI';
+            statusTime = lastSession.finish;
+          } else if (lastSession.start) {
+            statusText = 'BEKERJA';
+            statusTime = lastSession.start;
+          }
         }
         
         card.innerHTML = `
-          <div class="flex gap-3">
-            <div class="w-1/2 flex flex-col items-center justify-center gap-2">
-              ${photoHtml}
-              <p class="text-slate-800 font-semibold text-xs text-center leading-tight line-clamp-2">${worker.name}</p>
+          <div class="worker-left-section">
+            ${photoHTML}
+            <div class="worker-fullname">${worker.name}</div>
+          </div>
+          
+          <div class="worker-right-section">
+            <div class="worker-status-box">
+              <div class="status-label">${statusText}</div>
+              <div class="status-time">${statusTime}</div>
             </div>
-            <div class="w-1/2 flex flex-col gap-1.5">
-              <div class="text-center py-1 rounded-lg ${status ? 'bg-pink-100' : 'bg-slate-100'}">
-                <p class="text-[10px] ${status ? 'text-pink-500 font-semibold' : 'text-slate-500'}">${status || 'Belum dipilih'}</p>
-              </div>
-              <div class="grid grid-cols-2 gap-1 flex-1">
-                <button onclick="setStatus(${worker.id}, 'Start Work', '${container}')" class="btn-status py-2 ${status === 'Start Work' ? 'bg-green-600 ring-2 ring-green-400' : 'bg-green-500 hover:bg-green-600'} text-white rounded-lg text-[10px] font-semibold transition-all">Start</button>
-                <button onclick="setStatus(${worker.id}, 'Finish Work', '${container}')" class="btn-status py-2 ${status === 'Finish Work' ? 'bg-blue-600 ring-2 ring-blue-400' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded-lg text-[10px] font-semibold transition-all">Finish</button>
-                <button onclick="setStatus(${worker.id}, 'Sakit', '${container}')" class="btn-status py-2 ${status === 'Sakit' ? 'bg-orange-600 ring-2 ring-orange-400' : 'bg-orange-500 hover:bg-orange-600'} text-white rounded-lg text-[10px] font-semibold transition-all">Sakit</button>
-                <button onclick="setStatus(${worker.id}, 'Standby', '${container}')" class="btn-status py-2 ${status === 'Standby' ? 'bg-purple-600 ring-2 ring-purple-400' : 'bg-purple-500 hover:bg-purple-600'} text-white rounded-lg text-[10px] font-semibold transition-all">Standby</button>
-              </div>
+            
+            <div class="worker-actions-grid">
+              <button class="status-action-btn btn-start" data-id="${worker.id}">Start</button>
+              <button class="status-action-btn btn-finish" data-id="${worker.id}">Finish</button>
+              <button class="status-action-btn btn-break" data-id="${worker.id}">Break</button>
+              <button class="status-action-btn btn-resume" data-id="${worker.id}">Resume</button>
             </div>
           </div>
         `;
         
         grid.appendChild(card);
       });
+      
+      document.querySelectorAll('.btn-start').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const workerId = parseInt(btn.dataset.id);
+          recordTime(workerId, 'start');
+        });
+      });
+      
+      document.querySelectorAll('.btn-finish').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const workerId = parseInt(btn.dataset.id);
+          recordTime(workerId, 'finish');
+        });
+      });
+      
+      document.querySelectorAll('.btn-break').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const workerId = parseInt(btn.dataset.id);
+          recordTime(workerId, 'break');
+        });
+      });
+      
+      document.querySelectorAll('.btn-resume').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const workerId = parseInt(btn.dataset.id);
+          recordTime(workerId, 'resume');
+        });
+      });
     }
 
-    function setStatus(workerId, status, fromContainer) {
-      if (attendanceStatus[workerId] === status) {
-        delete attendanceStatus[workerId];
-      } else {
-        attendanceStatus[workerId] = status;
+    // Record start/finish time with toggle functionality
+    function recordTime(workerId, type) {
+      const now = new Date();
+      const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      if (!workSessions[workerId]) {
+        workSessions[workerId] = [];
       }
       
-      renderWorkers(workers);
-      updateCounter();
+      // Check if card is already selected with the same action
+      const isCurrentlySelected = selectedCards[workerId] === type;
       
-      const searchInput = document.getElementById('search-input');
-      if (searchInput.value.trim() !== '') {
-        const query = searchInput.value.toLowerCase().trim();
-        const filtered = workers.filter(w => w.name.toLowerCase().includes(query));
-        renderWorkers(filtered, 'search-results');
+      if (isCurrentlySelected) {
+        // UN-CLICK: Remove selection and revert status
+        delete selectedCards[workerId];
         
-        if (attendanceStatus[workerId]) {
-          setTimeout(() => clearSearch(), 1000);
+        // Remove the last action from session
+        const lastSession = workSessions[workerId][workSessions[workerId].length - 1];
+        if (lastSession) {
+          if (type === 'start' && lastSession.start && !lastSession.finish) {
+            workSessions[workerId].pop();
+          } else if (type === 'finish' && lastSession.finish) {
+            lastSession.finish = null;
+          } else if (type === 'break' && lastSession.break) {
+            lastSession.break = null;
+          } else if (type === 'resume' && lastSession.resume) {
+            lastSession.resume = null;
+          }
+        }
+        
+        showToast(`🔄 Status dibatalkan`);
+      } else {
+        // CLICK: Apply new status and select card
+        selectedCards[workerId] = type;
+        
+        if (type === 'start') {
+          workSessions[workerId].push({ start: timeString, finish: null, break: null, resume: null });
+          showToast(`⏰ Start time: ${timeString}`);
+        } else if (type === 'finish') {
+          const lastSession = workSessions[workerId][workSessions[workerId].length - 1];
+          if (lastSession && !lastSession.finish) {
+            lastSession.finish = timeString;
+            showToast(`✅ Finish time: ${timeString}`);
+          } else {
+            workSessions[workerId].push({ start: null, finish: timeString, break: null, resume: null });
+            showToast(`✅ Finish time: ${timeString}`);
+          }
+        } else if (type === 'break') {
+          const lastSession = workSessions[workerId][workSessions[workerId].length - 1];
+          if (lastSession) {
+            lastSession.break = timeString;
+            showToast(`☕ Break time: ${timeString}`);
+          }
+        } else if (type === 'resume') {
+          const lastSession = workSessions[workerId][workSessions[workerId].length - 1];
+          if (lastSession) {
+            lastSession.resume = timeString;
+            showToast(`▶️ Resume time: ${timeString}`);
+          }
         }
       }
-    }
-    
-    function updateCounter() {
-      const selectedCount = Object.keys(attendanceStatus).length;
-      const unselectedCount = workers.length - selectedCount;
-      document.getElementById('counter-selected').textContent = selectedCount;
-      document.getElementById('counter-unselected').textContent = unselectedCount;
-    }
-
-    function setAllPresent() {
-      workers.forEach(worker => { attendanceStatus[worker.id] = 'Start Work'; });
-      renderWorkers(workers);
-      updateCounter();
-      showNotification('Semua pekerja diset Start Work!');
-    }
-
-    function resetAllStatus() {
-      attendanceStatus = {};
-      renderWorkers(workers);
-      updateCounter();
-      showNotification('Status absensi direset!');
-    }
-
-    document.getElementById('search-input').addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase().trim();
-      const clearBtn = document.getElementById('clear-search');
-      const gridEl = document.getElementById('workers-grid');
-      const searchResults = document.getElementById('search-results');
-
-      if (query === '') {
-        clearBtn.classList.add('hidden');
-        gridEl.classList.remove('hidden');
-        searchResults.classList.add('hidden');
-        return;
-      }
-
-      clearBtn.classList.remove('hidden');
-      gridEl.classList.add('hidden');
-      searchResults.classList.remove('hidden');
-
-      const filtered = workers.filter(w => w.name.toLowerCase().includes(query));
       
-      if (filtered.length > 0) {
-        renderWorkers(filtered, 'search-results');
-      } else {
-        searchResults.innerHTML = `<div class="col-span-full text-center py-6"><p class="text-slate-400 text-sm">Tidak ditemukan</p></div>`;
+      generateWorkerCards();
+    }
+
+    // Show toast notification
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-20 right-4 bg-[#22c55e] text-white px-6 py-3 rounded-lg shadow-lg z-50';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // Setup page handlers
+    document.getElementById('btn-to-setup').addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('page-login').style.display = 'none';
+      showPage('page-setup');
+      if (appsScriptUrl) {
+        document.getElementById('apps-script-url').value = appsScriptUrl;
       }
     });
 
-    function clearSearch() {
-      document.getElementById('search-input').value = '';
-      document.getElementById('clear-search').classList.add('hidden');
-      document.getElementById('workers-grid').classList.remove('hidden');
-      document.getElementById('search-results').classList.add('hidden');
-      renderWorkers(workers);
+    document.getElementById('btn-back-from-setup').addEventListener('click', () => {
+      document.getElementById('page-login').style.display = 'flex';
+      showPage('page-login');
+    });
+
+    // Copy script button
+    document.getElementById('btn-copy-script').addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const codeElement = document.querySelector('#apps-script-code code');
+      const range = document.createRange();
+      range.selectNodeContents(codeElement);
+      
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      
+      try {
+        const successful = document.execCommand('copy');
+        selection.removeAllRanges();
+        
+        if (successful) {
+          const copyText = document.getElementById('copy-text');
+          copyText.textContent = '✅ Copied!';
+          setTimeout(() => {
+            copyText.textContent = 'Copy';
+          }, 2000);
+          showToast('✅ Kode berhasil di-copy!');
+        } else {
+          showToast('❌ Gagal copy. Silakan copy manual.');
+        }
+      } catch (err) {
+        console.error('Copy failed:', err);
+        showToast('❌ Gagal copy. Silakan copy manual.');
+      }
+    });
+
+    // Save and test URL
+    document.getElementById('btn-save-url').addEventListener('click', async () => {
+      const url = document.getElementById('apps-script-url').value.trim();
+      const resultDiv = document.getElementById('test-result');
+      
+      if (!url) {
+        resultDiv.className = 'mt-4 bg-red-500/20 border border-red-500 rounded-lg p-4';
+        resultDiv.innerHTML = '<p class="text-red-400 font-semibold">❌ URL tidak boleh kosong!</p>';
+        resultDiv.classList.remove('hidden');
+        return;
+      }
+      
+      resultDiv.className = 'mt-4 bg-blue-500/20 border border-blue-500 rounded-lg p-4';
+      resultDiv.innerHTML = '<p class="text-blue-400 font-semibold">⏳ Testing koneksi...</p>';
+      resultDiv.classList.remove('hidden');
+      
+      try {
+        const response = await fetch(`${url}?action=getWorkers`);
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.data) {
+          appsScriptUrl = url;
+          localStorage.setItem('appsScriptUrl', url);
+          
+          resultDiv.className = 'mt-4 bg-green-500/20 border border-green-500 rounded-lg p-4';
+          resultDiv.innerHTML = `
+            <p class="text-green-400 font-semibold mb-2">✅ Koneksi berhasil!</p>
+            <p class="text-sm text-gray-300">Berhasil memuat ${data.data.length} pekerja dari Google Sheets.</p>
+          `;
+          showToast(`✅ URL tersimpan! ${data.data.length} pekerja terdeteksi`);
+          
+          setTimeout(() => {
+            showPage('page-login');
+          }, 2000);
+        } else {
+          resultDiv.className = 'mt-4 bg-red-500/20 border border-red-500 rounded-lg p-4';
+          resultDiv.innerHTML = `
+            <p class="text-red-400 font-semibold mb-2">❌ Koneksi gagal!</p>
+            <p class="text-sm text-gray-300">Error: ${data.message || 'Format data tidak valid'}</p>
+          `;
+        }
+      } catch (error) {
+        resultDiv.className = 'mt-4 bg-red-500/20 border border-red-500 rounded-lg p-4';
+        resultDiv.innerHTML = `
+          <p class="text-red-400 font-semibold mb-2">❌ Tidak dapat terhubung!</p>
+          <p class="text-sm text-gray-300">${error.message}</p>
+          <p class="text-xs text-gray-400 mt-2">Pastikan Apps Script sudah di-deploy dengan benar.</p>
+        `;
+      }
+    });
+
+    // Login
+    document.getElementById('btn-login').addEventListener('click', () => {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      
+      if (username === config.login_username && password === config.login_password) {
+        document.getElementById('page-login').style.display = 'none';
+        showPage('page-attendance');
+        
+        // Initialize app with cache strategy
+        initApp();
+      } else {
+        const errorDiv = document.getElementById('login-error');
+        errorDiv.textContent = 'Username atau password salah!';
+        errorDiv.classList.remove('hidden');
+        
+        setTimeout(() => {
+          errorDiv.classList.add('hidden');
+        }, 3000);
+      }
+    });
+
+    // Navigation buttons
+    document.getElementById('btn-to-recap').addEventListener('click', () => showPage('page-recap'));
+    document.getElementById('btn-back-from-recap').addEventListener('click', () => showPage('page-attendance'));
+    document.getElementById('btn-back-from-detail').addEventListener('click', () => showPage('page-recap'));
+    document.getElementById('btn-back-from-jam').addEventListener('click', () => showPage('page-recap'));
+    
+    // Hadir Semua button
+    document.getElementById('btn-hadir-semua').addEventListener('click', () => {
+      const now = new Date();
+      const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      workers.forEach(worker => {
+        if (!workSessions[worker.id]) {
+          workSessions[worker.id] = [];
+        }
+        workSessions[worker.id].push({ start: timeString, finish: null, break: null, resume: null });
+      });
+      
+      generateWorkerCards();
+      showToast(`✅ Semua pekerja ditandai hadir pada ${timeString}`);
+    });
+    
+    // Reset button
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      workSessions = {};
+      selectedCards = {}; // Reset pink selections
+      generateWorkerCards();
+      showToast('🔄 Semua status direset');
+    });
+    
+    document.getElementById('btn-recap-today').addEventListener('click', () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date-picker').value = today;
+      generateRecapTable(today);
+      showPage('page-recap-detail');
+    });
+    
+    document.getElementById('btn-recap-date').addEventListener('click', () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date-picker').value = today;
+      generateRecapTable(today);
+      showPage('page-recap-detail');
+    });
+    
+    document.getElementById('btn-recap-jam').addEventListener('click', () => showPage('page-recap-jam'));
+    
+    document.getElementById('date-picker').addEventListener('change', (e) => {
+      generateRecapTable(e.target.value);
+    });
+
+    // Generate recap table
+    function generateRecapTable(date) {
+      const tbody = document.getElementById('recap-table-body');
+      tbody.innerHTML = '';
+      
+      workers.forEach(worker => {
+        const row = document.createElement('tr');
+        row.className = 'border-b border-[#334155]';
+        
+        let html = `<td class="sticky-column px-4 py-3 font-semibold">${worker.name}</td>`;
+        
+        for (let hour = 0; hour < 24; hour++) {
+          const hasData = Math.random() > 0.7;
+          const cellClass = hasData ? 'bg-[#22c55e]' : 'bg-[#1e293b]';
+          html += `<td class="${cellClass} px-4 py-3 text-center">-</td>`;
+        }
+        
+        row.innerHTML = html;
+        tbody.appendChild(row);
+      });
     }
 
-    async function handlePhotoUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const originalImage = e.target.result;
-        const timestampedImage = await addTimemark(originalImage);
-        uploadedPhotos.push(timestampedImage);
-        renderPhotoThumbnails();
-        event.target.value = '';
-      };
-      reader.readAsDataURL(file);
+    // Calculate work hours
+    function calculateWorkHours(sessions) {
+      let totalMinutes = 0;
+      
+      sessions.forEach(session => {
+        if (!session.start || !session.finish) return;
+        
+        const startTime = session.start.replace('.', ':');
+        const finishTime = session.finish.replace('.', ':');
+        
+        const [startHour, startMin] = startTime.split(':').map(Number);
+        const [finishHour, finishMin] = finishTime.split(':').map(Number);
+        
+        let startTotalMin = startHour * 60 + startMin;
+        let finishTotalMin = finishHour * 60 + finishMin;
+        
+        if (finishTotalMin < startTotalMin) {
+          finishTotalMin += 1440;
+        }
+        
+        const duration = finishTotalMin - startTotalMin;
+        if (!isNaN(duration) && duration > 0) {
+          totalMinutes += duration;
+        }
+      });
+      
+      return (totalMinutes / 60).toFixed(2);
     }
 
-    async function addTimemark(imageDataUrl) {
+    // Search worker and calculate hours
+    document.getElementById('search-worker').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const worker = workers.find(w => w.name.toLowerCase().includes(searchTerm));
+      
+      if (worker && searchTerm.length > 2) {
+        document.getElementById('worker-result').classList.remove('hidden');
+        document.getElementById('result-worker-photo').textContent = worker.photo;
+        document.getElementById('result-worker-name').textContent = worker.name;
+        
+        const sessions = workSessions[worker.id] || [];
+        const totalHours = calculateWorkHours(sessions);
+        document.getElementById('total-hours').textContent = totalHours;
+        
+        const sessionsList = document.getElementById('sessions-list');
+        sessionsList.innerHTML = '';
+        
+        sessions.forEach((session, index) => {
+          const div = document.createElement('div');
+          div.className = 'bg-[#1e293b] rounded-lg p-4';
+          div.innerHTML = `
+            <h4 class="font-bold mb-2">Sesi ${index + 1}</h4>
+            <div class="flex justify-between text-sm">
+              <span>Start: <span class="text-[#22c55e] font-semibold">${session.start || '-'}</span></span>
+              <span>Finish: <span class="text-[#3b82f6] font-semibold">${session.finish || '-'}</span></span>
+            </div>
+          `;
+          sessionsList.appendChild(div);
+        });
+      } else {
+        document.getElementById('worker-result').classList.add('hidden');
+      }
+    });
+
+    // Initialize
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // Get current location
+    function getCurrentLocation() {
       return new Promise((resolve) => {
+        // Skip geolocation in iframe environment (permissions policy block)
+        // Always return null coordinates
+        resolve({ lat: null, lng: null });
+      });
+    }
+
+    // Reverse geocoding to get address from coordinates
+    async function getAddressFromCoords(lat, lng) {
+      if (!lat || !lng) return 'Lokasi tidak tersedia';
+      
+      try {
+        // Using OpenStreetMap Nominatim API (free, no API key needed)
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+        const data = await response.json();
+        
+        if (data && data.display_name) {
+          // Extract relevant parts of address
+          const address = data.address;
+          const parts = [];
+          
+          if (address.road) parts.push(address.road);
+          if (address.suburb || address.village) parts.push(address.suburb || address.village);
+          if (address.city || address.town) parts.push(address.city || address.town);
+          
+          return parts.length > 0 ? parts.join(', ') : data.display_name.substring(0, 50);
+        }
+      } catch (error) {
+        console.error('Geocoding error:', error);
+      }
+      
+      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    }
+
+    // Load company logo image with direct download link
+    const companyLogoFileId = '1zaavYZSem-yNHztE724qeIAWw9uGJgen';
+    const companyLogoUrl = `https://drive.google.com/uc?export=download&id=${companyLogoFileId}`;
+    
+    const companyLogo = new Image();
+    companyLogo.crossOrigin = 'anonymous';
+    
+    let companyLogoLoaded = false;
+    
+    // Add success handler
+    companyLogo.onload = () => {
+      console.log('✅ Company logo loaded successfully!');
+      companyLogoLoaded = true;
+    };
+    
+    // Add error handling for logo
+    companyLogo.onerror = () => {
+      console.warn('⚠️ Company logo failed to load, trying alternative URL');
+      companyLogoLoaded = false;
+      // Try alternative URL
+      companyLogo.src = `https://lh3.googleusercontent.com/d/${companyLogoFileId}`;
+    };
+    
+    // Start loading
+    companyLogo.src = companyLogoUrl;
+
+    // Add watermark to photo with HIGH RESOLUTION and AUTO RESIZE
+    async function addWatermarkToPhoto(imageDataUrl) {
+      return new Promise(async (resolve) => {
         const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
+        img.onload = async () => {
+          const canvas = document.getElementById('watermark-canvas');
           const ctx = canvas.getContext('2d');
           
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
+          // Determine orientation: Portrait or Landscape
+          const isPortrait = img.height > img.width;
           
-          const now = new Date();
-          const padding = Math.min(canvas.width, canvas.height) * 0.03;
-          const fontSize = Math.min(canvas.width, canvas.height) * 0.04;
-          
-          ctx.textBaseline = 'top';
-          ctx.font = `bold ${fontSize}px Poppins, sans-serif`;
-          
-          const timeDisplay = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-          const dateStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-          
-          const bottomY = canvas.height - padding - fontSize * 3;
-          
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-          ctx.fillRect(padding - 5, bottomY - 5, canvas.width * 0.5, fontSize * 3 + 10);
-          
-          ctx.fillStyle = '#ffffff';
-          ctx.fillText(timeDisplay, padding, bottomY);
-          ctx.font = `${fontSize * 0.7}px Poppins, sans-serif`;
-          ctx.fillText(dateStr, padding, bottomY + fontSize + 5);
-          
-          if (cachedAddress) {
-            const shortAddr = cachedAddress.length > 40 ? cachedAddress.substring(0, 40) + '...' : cachedAddress;
-            ctx.fillText('📍 ' + shortAddr, padding, bottomY + fontSize * 2);
+          // Target dimensions based on orientation
+          let targetWidth, targetHeight;
+          if (isPortrait) {
+            targetWidth = 1080;
+            targetHeight = 1920;
+          } else {
+            targetWidth = 1920;
+            targetHeight = 1080;
           }
           
-          resolve(canvas.toDataURL('image/jpeg', 0.9));
+          // Calculate aspect ratios
+          const sourceRatio = img.width / img.height;
+          const targetRatio = targetWidth / targetHeight;
+          
+          // Calculate crop dimensions to maintain aspect ratio (cover fit)
+          let sourceX = 0, sourceY = 0, sourceWidth = img.width, sourceHeight = img.height;
+          
+          if (sourceRatio > targetRatio) {
+            // Source is wider, crop width
+            sourceWidth = img.height * targetRatio;
+            sourceX = (img.width - sourceWidth) / 2;
+          } else {
+            // Source is taller, crop height
+            sourceHeight = img.width / targetRatio;
+            sourceY = (img.height - sourceHeight) / 2;
+          }
+          
+          // Set canvas to target high-resolution dimensions
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          
+          // Enable high-quality image smoothing
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          
+          // Draw cropped and resized image at target resolution
+          ctx.drawImage(
+            img,
+            sourceX, sourceY, sourceWidth, sourceHeight,  // Source crop
+            0, 0, targetWidth, targetHeight               // Destination size
+          );
+          
+          // Calculate responsive sizes - SMALLER for landscape, normal for portrait
+          const sizeMultiplier = isPortrait ? 1.0 : 0.5; // 50% smaller for landscape
+          const baseFontSize = canvas.width * 0.03 * sizeMultiplier; // Base font
+          const largeFontSize = canvas.width * 0.045 * sizeMultiplier; // Large font
+          const padding = canvas.width * 0.04 * sizeMultiplier; // Padding
+          const lineHeight = canvas.width * 0.055 * sizeMultiplier; // Line height
+          
+          // Get current date and time
+          const now = new Date();
+          const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+          const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+          
+          const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+          const dayName = days[now.getDay()];
+          const dateString = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+          
+          // Get location (will be null in iframe)
+          const location = await getCurrentLocation();
+          const address = await getAddressFromCoords(location.lat, location.lng);
+          
+          // === TOP RIGHT WATERMARK: TimeMark (3X LARGER) ===
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'top';
+          
+          // Strong shadow for readability on white background
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+          ctx.shadowBlur = 15;
+          ctx.shadowOffsetX = 5;
+          ctx.shadowOffsetY = 5;
+          
+          // "TimeMark" - 3X larger
+          ctx.font = `bold ${largeFontSize * 2}px 'Bebas Neue', sans-serif`;
+          
+          // Measure "Mark" width first
+          const markWidth = ctx.measureText('Mark').width;
+          
+          // Draw "Mark" in white
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText('Mark', canvas.width - padding, padding);
+          
+          // Draw "Time" in yellow before "Mark"
+          ctx.fillStyle = '#facc15';
+          ctx.fillText('Time', canvas.width - padding - markWidth, padding);
+          
+          // "100% photo verified" - same width as TimeMark, 3X larger
+          ctx.font = `700 ${baseFontSize * 1.3}px 'Poppins', sans-serif`;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText('100% photo verified', canvas.width - padding, padding + (largeFontSize * 2.2));
+          
+          // === BOTTOM LEFT WATERMARK (3 Baris - 3X LARGER) ===
+          
+          // Calculate sizes - adjust based on orientation
+          const logoSize = canvas.width * 0.16 * sizeMultiplier; // Smaller for landscape
+          const logoCardPadding = canvas.width * 0.03 * sizeMultiplier;
+          const logoCardRadius = canvas.width * 0.03 * sizeMultiplier;
+          
+          // Calculate dimensions
+          const logoCardWidth = logoSize + (logoCardPadding * 2);
+          const logoCardHeight = logoSize + (logoCardPadding * 2);
+          
+          // Vertical spacing between elements - adjusted for orientation
+          const marginAfterLogo = canvas.width * 0.03 * sizeMultiplier; // Smaller margin for landscape
+          const marginAfterTime = canvas.width * 0.005 * sizeMultiplier; // Smaller margin
+          
+          // Calculate heights for each section
+          const timeBlockHeight = largeFontSize * 3; // Height of time text
+          const locationBlockHeight = baseFontSize * 1.5; // Height of location text
+          
+          // Calculate total height from bottom to top
+          const totalBottomHeight = locationBlockHeight + marginAfterTime + timeBlockHeight + marginAfterLogo + logoCardHeight;
+          const bottomY = canvas.height - (padding * 0.8);
+          
+          // Reset shadow before drawing logo card
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          
+          // POSITION 1: Logo Perusahaan dalam Card Putih (PALING ATAS)
+          const logoCardX = padding;
+          const logoCardY = bottomY - totalBottomHeight; // Position at top of watermark area
+          
+          // Draw rounded white card background for logo with shadow
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+          ctx.shadowBlur = 15;
+          ctx.shadowOffsetX = 5;
+          ctx.shadowOffsetY = 5;
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+          
+          // Draw rounded rectangle for logo card
+          ctx.beginPath();
+          ctx.moveTo(logoCardX + logoCardRadius, logoCardY);
+          ctx.lineTo(logoCardX + logoCardWidth - logoCardRadius, logoCardY);
+          ctx.quadraticCurveTo(logoCardX + logoCardWidth, logoCardY, logoCardX + logoCardWidth, logoCardY + logoCardRadius);
+          ctx.lineTo(logoCardX + logoCardWidth, logoCardY + logoCardHeight - logoCardRadius);
+          ctx.quadraticCurveTo(logoCardX + logoCardWidth, logoCardY + logoCardHeight, logoCardX + logoCardWidth - logoCardRadius, logoCardY + logoCardHeight);
+          ctx.lineTo(logoCardX + logoCardRadius, logoCardY + logoCardHeight);
+          ctx.quadraticCurveTo(logoCardX, logoCardY + logoCardHeight, logoCardX, logoCardY + logoCardHeight - logoCardRadius);
+          ctx.lineTo(logoCardX, logoCardY + logoCardRadius);
+          ctx.quadraticCurveTo(logoCardX, logoCardY, logoCardX + logoCardRadius, logoCardY);
+          ctx.closePath();
+          ctx.fill();
+          
+          // Reset shadow for logo drawing
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          
+          // Wait for company logo to load and draw it
+          if (companyLogoLoaded && companyLogo.complete && companyLogo.naturalWidth > 0) {
+            try {
+              console.log('🎨 Drawing company logo...');
+              ctx.drawImage(
+                companyLogo, 
+                logoCardX + logoCardPadding, 
+                logoCardY + logoCardPadding, 
+                logoSize, 
+                logoSize
+              );
+              console.log('✅ Logo drawn successfully');
+            } catch (logoError) {
+              console.error('❌ Failed to draw logo:', logoError);
+              // Fallback to emoji (3X larger)
+              ctx.font = `bold ${logoSize * 0.7}px 'Bebas Neue', sans-serif`;
+              ctx.fillStyle = '#ff8c00';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText('🏢', logoCardX + logoCardWidth / 2, logoCardY + logoCardHeight / 2);
+            }
+          } else {
+            console.warn('⚠️ Logo not loaded, using fallback emoji');
+            // Fallback to emoji if logo is not loaded
+            ctx.font = `bold ${logoSize * 0.7}px 'Bebas Neue', sans-serif`;
+            ctx.fillStyle = '#ff8c00';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🏢', logoCardX + logoCardWidth / 2, logoCardY + logoCardHeight / 2);
+          }
+          
+          // Reset styles for text with better shadow
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+          ctx.shadowBlur = 12;
+          ctx.shadowOffsetX = 4;
+          ctx.shadowOffsetY = 4;
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'bottom';
+          
+          const textStartX = padding;
+          
+          // POSITION 2: Jam (HH:MM) | Garis Kuning | Hari + Tanggal (DI BAWAH LOGO DENGAN JARAK 20px)
+          const timeY = logoCardY + logoCardHeight + marginAfterLogo + timeBlockHeight;
+          
+          // Jam dengan Bebas Neue font (3X larger)
+          ctx.font = `bold ${largeFontSize * 3}px 'Bebas Neue', sans-serif`;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(timeString, textStartX, timeY);
+          
+          const timeWidth = ctx.measureText(timeString).width;
+          
+          // Garis vertikal kuning (THICKER - 3X) - tinggi sama dengan tinggi teks jam
+          const separatorX = textStartX + timeWidth + (padding * 0.4);
+          const separatorHeight = timeBlockHeight; // Same height as time text
+          ctx.strokeStyle = '#facc15';
+          ctx.lineWidth = 12; // Much thicker line
+          ctx.beginPath();
+          ctx.moveTo(separatorX, timeY - separatorHeight);
+          ctx.lineTo(separatorX, timeY);
+          ctx.stroke();
+          
+          // Hari (atas) dan Tanggal Lengkap (bawah) - sejajar dengan garis kuning
+          const dateStartX = separatorX + (padding * 0.5);
+          const dayDateSpacing = baseFontSize * 1.5; // Clear spacing between day and date
+          
+          // Hari - aligned with top of time text
+          ctx.font = `700 ${baseFontSize * 1.3}px 'Poppins', sans-serif`;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(dayName, dateStartX, timeY - dayDateSpacing);
+          
+          // Tanggal - aligned with bottom of time text
+          ctx.font = `600 ${baseFontSize * 1.1}px 'Poppins', sans-serif`;
+          ctx.fillText(dateString, dateStartX, timeY);
+          
+          // POSITION 3: Lokasi dengan ikon 📍 (PALING BAWAH DENGAN JARAK 10px DARI JAM)
+          const locationY = timeY + marginAfterTime + locationBlockHeight;
+          ctx.font = `700 ${baseFontSize * 1.1}px 'Poppins', sans-serif`;
+          const locationText = `📍 ${address}`;
+          const maxLocationWidth = canvas.width * 0.55; // Limit width
+          
+          // Truncate address if too long
+          let displayLocation = locationText;
+          if (ctx.measureText(locationText).width > maxLocationWidth) {
+            displayLocation = locationText.substring(0, 60) + '...';
+          }
+          
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(displayLocation, textStartX, locationY);
+          
+          // Reset shadow
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          
+          // Convert to high-quality data URL
+          const watermarkedImage = canvas.toDataURL('image/jpeg', 0.95); // 95% quality
+          resolve(watermarkedImage);
         };
+        
+        img.onerror = (error) => {
+          console.error('❌ Failed to load image for watermark:', error);
+          showToast('❌ Gagal memuat gambar');
+          resolve(null);
+        };
+        
         img.src = imageDataUrl;
       });
     }
 
-    function renderPhotoThumbnails() {
-      const container = document.getElementById('photo-thumbnails');
-      const badge = document.getElementById('photo-count-badge');
+    // Render photo gallery
+    function renderPhotoGallery() {
+      const gallery = document.getElementById('photo-gallery');
+      gallery.innerHTML = '';
       
-      if (uploadedPhotos.length === 0) {
-        container.classList.add('hidden');
-        badge.classList.add('hidden');
+      if (attendancePhotos.length === 0) {
+        gallery.innerHTML = '<p class="col-span-full text-center text-gray-400 py-8">Belum ada foto. Klik "Ambil Foto" untuk memulai.</p>';
         return;
       }
       
-      container.classList.remove('hidden');
-      badge.classList.remove('hidden');
-      badge.textContent = `${uploadedPhotos.length} foto`;
+      attendancePhotos.forEach((photo, index) => {
+        const container = document.createElement('div');
+        container.className = 'photo-thumbnail-container';
+        
+        const img = document.createElement('img');
+        img.src = photo;
+        img.alt = `Foto Absen ${index + 1}`;
+        
+        container.appendChild(img);
+        container.addEventListener('click', () => openLightbox(index));
+        
+        gallery.appendChild(container);
+      });
+    }
+
+    // Open lightbox
+    function openLightbox(index) {
+      currentLightboxIndex = index;
+      const modal = document.getElementById('lightbox-modal');
+      const img = document.getElementById('lightbox-image');
       
-      container.innerHTML = uploadedPhotos.map((photo, index) => `
-        <div class="photo-thumbnail relative aspect-square rounded-lg overflow-hidden bg-slate-700" onclick="openFullscreen(${index})">
-          <img src="${photo}" alt="Foto ${index + 1}" class="w-full h-full object-cover">
-          <button class="delete-btn" onclick="deletePhoto(${index}, event)">
-            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
-      `).join('');
-    }
-
-    function deletePhoto(index, event) {
-      event.stopPropagation();
-      uploadedPhotos.splice(index, 1);
-      renderPhotoThumbnails();
-    }
-
-    function openFullscreen(index) {
-      currentPhotoIndex = index;
-      const viewer = document.getElementById('fullscreen-viewer');
-      const image = document.getElementById('fullscreen-image');
-      const counter = document.getElementById('photo-counter');
+      img.src = attendancePhotos[currentLightboxIndex];
+      modal.classList.add('active');
       
-      image.src = uploadedPhotos[index];
-      counter.textContent = `${index + 1} / ${uploadedPhotos.length}`;
-      viewer.classList.remove('hidden');
+      // Show/hide navigation buttons
+      updateLightboxNavigation();
     }
 
-    function closeFullscreen(event) {
-      const viewer = document.getElementById('fullscreen-viewer');
-      if (event.target === viewer) {
-        viewer.classList.add('hidden');
-        viewer.dataset.mode = '';
-      }
+    // Close lightbox
+    function closeLightbox() {
+      const modal = document.getElementById('lightbox-modal');
+      modal.classList.remove('active');
     }
 
-    function handleNavClick(direction, event) {
-      event.stopPropagation();
-      const viewer = document.getElementById('fullscreen-viewer');
-      const mode = viewer.dataset.mode;
-      
-      if (mode === 'gallery') {
-        navigateGalleryPhoto(direction, event);
+    // Navigate lightbox
+    function navigateLightbox(direction) {
+      if (direction === 'next') {
+        currentLightboxIndex = (currentLightboxIndex + 1) % attendancePhotos.length;
       } else {
-        navigatePhoto(direction, event);
+        currentLightboxIndex = (currentLightboxIndex - 1 + attendancePhotos.length) % attendancePhotos.length;
       }
-    }
-
-    function navigatePhoto(direction, event) {
-      event.stopPropagation();
-      currentPhotoIndex += direction;
       
-      if (currentPhotoIndex < 0) currentPhotoIndex = uploadedPhotos.length - 1;
-      if (currentPhotoIndex >= uploadedPhotos.length) currentPhotoIndex = 0;
+      const img = document.getElementById('lightbox-image');
+      img.src = attendancePhotos[currentLightboxIndex];
+      updateLightboxNavigation();
+    }
+
+    // Update lightbox navigation visibility
+    function updateLightboxNavigation() {
+      const prevBtn = document.getElementById('lightbox-prev');
+      const nextBtn = document.getElementById('lightbox-next');
       
-      document.getElementById('fullscreen-image').src = uploadedPhotos[currentPhotoIndex];
-      document.getElementById('photo-counter').textContent = `${currentPhotoIndex + 1} / ${uploadedPhotos.length}`;
-    }
-
-    function formatDateForSearch(date) {
-      const d = date.getDate();
-      const m = date.getMonth() + 1;
-      const y = date.getFullYear();
-      return `${d}/${m}/${y}`;
-    }
-
-    async function submitAttendance() {
-      const btn = document.getElementById('submit-btn');
-      btn.disabled = true;
-      btn.textContent = 'Mengirim...';
-
-      const now = new Date();
-      const tanggal = formatDateForSearch(now);
-      const jam = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
-
-      const attendance = workers.map(w => ({
-        name: w.name,
-        status: attendanceStatus[w.id] || '-'
-      }));
-
-      try {
-        const formData = new FormData();
-        formData.append('data', JSON.stringify({ action: 'submitAttendance', tanggal, jam, attendance }));
-
-        await fetch(scriptUrl, { method: 'POST', body: formData, redirect: 'follow' });
-
-        for (let i = 0; i < uploadedPhotos.length; i++) {
-          const photoFormData = new FormData();
-          photoFormData.append('data', JSON.stringify({ action: 'uploadPhoto', tanggal, jam, photo: uploadedPhotos[i], index: i + 1 }));
-          await fetch(scriptUrl, { method: 'POST', body: photoFormData, redirect: 'follow' });
-        }
-
-        showNotification('Absen berhasil dikirim!');
-        attendanceStatus = {};
-        uploadedPhotos = [];
-        renderPhotoThumbnails();
-        renderWorkers(workers);
-        updateCounter();
-        
-      } catch (error) {
-        showNotification('Gagal mengirim. Cek koneksi atau URL Script.', true);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="inline-flex items-center gap-2"><svg class="w-4 h-4 transform rotate-[-35deg]" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>Kirim Absensi</span>';
-      }
-    }
-
-    async function showRecapToday() {
-      recapSource = 'today';
-      const today = formatDateForSearch(new Date());
-      await showRecapForDate(today);
-    }
-
-    async function showRecapForDate(date, source = recapSource) {
-      recapSource = source;
-      showPage('page-recap-detail');
-      currentRecapDate = date;
-      
-      const titleEl = document.getElementById('recap-title');
-      const dateLabel = document.getElementById('recap-date-label');
-      
-      const today = formatDateForSearch(new Date());
-      if (date === today) {
-        titleEl.textContent = 'Recap Absen Hari Ini';
+      if (attendancePhotos.length <= 1) {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
       } else {
-        titleEl.textContent = 'Recap Absen Tanggal';
-      }
-      dateLabel.textContent = date;
-      
-      document.getElementById('recap-loading').classList.remove('hidden');
-      document.getElementById('recap-content').classList.add('hidden');
-      document.getElementById('recap-empty').classList.add('hidden');
-
-      try {
-        const response = await fetch(`${scriptUrl}?action=getAttendance&date=${encodeURIComponent(date)}`);
-        const result = await response.json();
-        
-        document.getElementById('recap-loading').classList.add('hidden');
-
-        if (result.success && result.data && result.data.length > 0) {
-          currentRecapData = result.data;
-          renderRecapTable(result.data);
-          document.getElementById('recap-content').classList.remove('hidden');
-          document.getElementById('download-pdf-btn').classList.remove('hidden');
-        } else {
-          currentRecapData = [];
-          document.getElementById('recap-empty').classList.remove('hidden');
-          document.getElementById('download-pdf-btn').classList.add('hidden');
-        }
-      } catch (error) {
-        document.getElementById('recap-loading').innerHTML = `<p class="text-red-400 text-sm">Error: ${error.message}</p>`;
+        prevBtn.style.display = 'block';
+        nextBtn.style.display = 'block';
       }
     }
 
-    function renderRecapTable(data) {
-      const container = document.getElementById('recap-content');
-      container.innerHTML = '';
-
-      const timeColumns = [];
-      const workersMap = new Map();
-      
-      // Get all workers from the master list
-      const allWorkerNames = workers.map(w => w.name);
-      
-      data.forEach(record => {
-        if (!timeColumns.includes(record.jam)) {
-          timeColumns.push(record.jam);
-        }
-        record.workers.forEach(w => {
-          if (!workersMap.has(w.name)) {
-            workersMap.set(w.name, {});
-          }
-          workersMap.get(w.name)[record.jam] = w.status;
-        });
-      });
-
-      // Calculate unique status per person (1 person = 1 count max per status)
-      const workerStatusSets = new Map(); // Map<workerName, Set<status>>
-      
-      workersMap.forEach((statuses, workerName) => {
-        const statusSet = new Set();
-        Object.values(statuses).forEach(status => {
-          if (status && status !== '-') {
-            statusSet.add(status);
-          }
-        });
-        workerStatusSets.set(workerName, statusSet);
-      });
-
-      // Count unique workers per status
-      const counts = { 'Start Work': 0, 'Finish Work': 0, 'Sakit': 0, 'Standby': 0, 'Belum Absen': 0 };
-      const statusWorkers = { 'Start Work': [], 'Finish Work': [], 'Sakit': [], 'Standby': [], 'Belum Absen': [] };
-      
-      // Get all workers who appear in today's data
-      const workersInData = new Set(workersMap.keys());
-      
-      workerStatusSets.forEach((statusSet, workerName) => {
-        // Count each status only once per person
-        ['Start Work', 'Finish Work', 'Sakit', 'Standby'].forEach(status => {
-          if (statusSet.has(status)) {
-            counts[status]++;
-            statusWorkers[status].push(workerName);
-          }
-        });
-        
-        // If worker has NO valid status at all (only "-" or empty), count as Belum Absen
-        if (statusSet.size === 0) {
-          counts['Belum Absen']++;
-          statusWorkers['Belum Absen'].push(workerName);
-        }
-      });
-      
-      // Also count workers who are not in today's data at all as "Belum Absen"
-      allWorkerNames.forEach(name => {
-        if (!workersInData.has(name)) {
-          counts['Belum Absen']++;
-          statusWorkers['Belum Absen'].push(name);
-        }
-      });
-
-      // Store for modal
-      window.currentStatusWorkers = statusWorkers;
-
-      const displayTanggal = data[0]?.tanggal || currentRecapDate;
-
-      let summaryHtml = `
-        <div class="mb-4 grid grid-cols-2 sm:grid-cols-5 gap-2">
-          <div class="status-card rounded-lg p-3 text-center" style="background-color: #22c55e;" onclick="showStatusModal('Start Work')">
-            <p class="text-2xl font-bold text-white">${counts['Start Work']}</p>
-            <p class="text-xs font-medium text-white">Start Work 👆</p>
-          </div>
-          <div class="status-card rounded-lg p-3 text-center" style="background-color: #3b82f6;" onclick="showStatusModal('Finish Work')">
-            <p class="text-2xl font-bold text-white">${counts['Finish Work']}</p>
-            <p class="text-xs font-medium text-white">Finish Work 👆</p>
-          </div>
-          <div class="status-card clickable rounded-lg p-3 text-center" style="background-color: #f97316;" onclick="showStatusModal('Sakit')">
-            <p class="text-2xl font-bold text-white">${counts['Sakit']}</p>
-            <p class="text-xs font-medium text-white">Sakit 👆</p>
-          </div>
-          <div class="status-card clickable rounded-lg p-3 text-center" style="background-color: #a855f7;" onclick="showStatusModal('Standby')">
-            <p class="text-2xl font-bold text-white">${counts['Standby']}</p>
-            <p class="text-xs font-medium text-white">Standby 👆</p>
-          </div>
-          <div class="status-card clickable rounded-lg p-3 text-center" style="background-color: #64748b;" onclick="showStatusModal('Belum Absen')">
-            <p class="text-2xl font-bold text-white">${counts['Belum Absen']}</p>
-            <p class="text-xs font-medium text-white">Belum Absen 👆</p>
-          </div>
-        </div>
-      `;
-
-      let tableHtml = `
-        <div class="overflow-x-auto rounded-xl border border-slate-600 shadow-lg">
-          <table class="recap-table min-w-full">
-            <thead>
-              <tr>
-                <th class="sticky-col text-left bg-slate-900 text-white" style="min-width: 180px;"></th>
-                ${timeColumns.map(() => `<th class="bg-slate-900 text-white font-bold" style="min-width: 120px;">${displayTanggal}</th>`).join('')}
-              </tr>
-              <tr>
-                <th class="sticky-col text-left bg-slate-800 text-slate-300" style="min-width: 180px;">Nama Pekerja</th>
-                ${timeColumns.map(jam => `<th class="bg-slate-800 text-yellow-400 font-semibold" style="min-width: 120px;">${jam}</th>`).join('')}
-              </tr>
-            </thead>
-            <tbody>
-      `;
-
-      const statusStyles = {
-        'Start Work': { bg: '#22c55e', text: '#ffffff' },
-        'Finish Work': { bg: '#3b82f6', text: '#ffffff' },
-        'Sakit': { bg: '#f97316', text: '#ffffff' },
-        'Standby': { bg: '#a855f7', text: '#ffffff' },
-        '-': { bg: '#64748b', text: '#ffffff' }
-      };
-
-      let rowIndex = 0;
-      workersMap.forEach((statuses, workerName) => {
-        const rowBg = rowIndex % 2 === 0 ? 'bg-slate-800/50' : 'bg-slate-900/50';
-        tableHtml += `<tr class="${rowBg}">
-          <td class="sticky-col text-left text-white font-medium whitespace-nowrap px-3 py-2 border-r border-slate-600" style="background: ${rowIndex % 2 === 0 ? '#1e293b' : '#0f172a'};">${workerName}</td>`;
-        
-        timeColumns.forEach(jam => {
-          const status = statuses[jam] || '-';
-          const style = statusStyles[status] || statusStyles['-'];
-          const displayStatus = status === '-' ? '-' : status;
-          const cellStyle = `background-color: ${style.bg}; color: ${style.text};`;
-          tableHtml += `<td class="text-center font-medium px-3 py-2 border-slate-600" style="${cellStyle}">${displayStatus}</td>`;
-        });
-        
-        tableHtml += `</tr>`;
-        rowIndex++;
-      });
-
-      tableHtml += `</tbody></table></div>`;
-
-      container.innerHTML = summaryHtml + tableHtml;
-    }
-
-    function showStatusModal(status) {
-      const modal = document.getElementById('status-modal');
-      const title = document.getElementById('modal-title');
-      const body = document.getElementById('modal-body');
-      
-      const workerNames = window.currentStatusWorkers[status] || [];
-      
-      title.textContent = `Daftar Pekerja - ${status} (${workerNames.length})`;
-      
-      if (workerNames.length === 0) {
-        body.innerHTML = `<p class="text-slate-400 text-center py-4">Tidak ada pekerja dengan status ${status}</p>`;
-      } else {
-        body.innerHTML = workerNames.map(name => {
-          const worker = workers.find(w => w.name === name);
-          const photoUrl = worker ? convertDriveLink(worker.photo) : '';
-          
-          let photoHtml = '';
-          if (photoUrl && photoUrl.startsWith('http')) {
-            photoHtml = `<img src="${photoUrl}" alt="${name}" class="w-12 h-12 rounded-full object-cover" onerror="this.outerHTML='<div class=\\'avatar bg-gradient-to-br from-orange-400 to-pink-500\\'>${name.charAt(0).toUpperCase()}</div>'">`;
-          } else {
-            photoHtml = `<div class="avatar bg-gradient-to-br from-orange-400 to-pink-500">${name.charAt(0).toUpperCase()}</div>`;
-          }
-          
-          return `
-            <div class="worker-list-item">
-              ${photoHtml}
-              <span class="text-white font-medium">${name}</span>
-            </div>
-          `;
-        }).join('');
-      }
-      
-      modal.classList.remove('hidden');
-    }
-
-    function closeStatusModal(event) {
-      if (!event || event.target === document.getElementById('status-modal')) {
-        document.getElementById('status-modal').classList.add('hidden');
-      }
-    }
-
-    function showRecapJam() {
-      showPage('page-recap-jam');
-    }
-
-    // Recap Jam Search
-    document.getElementById('jam-search-input').addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase().trim();
-      const resultsContainer = document.getElementById('jam-search-results');
-      const resultContainer = document.getElementById('jam-result-container');
-      const noResult = document.getElementById('jam-no-result');
-      
-      if (query === '') {
-        resultsContainer.innerHTML = '';
-        resultContainer.classList.add('hidden');
-        noResult.classList.remove('hidden');
+    // Camera button handler
+    document.getElementById('btn-ambil-foto').addEventListener('click', () => {
+      if (attendancePhotos.length >= 10) {
+        showToast('❌ Maksimal 10 foto sudah tercapai!');
         return;
       }
       
-      const matchingWorkers = [];
-      const workersMap = new Map();
-      
-      currentRecapData.forEach(record => {
-        record.workers.forEach(w => {
-          if (!workersMap.has(w.name)) {
-            workersMap.set(w.name, []);
-          }
-          workersMap.get(w.name).push({ jam: record.jam, status: w.status });
-        });
-      });
-      
-      workersMap.forEach((sessions, name) => {
-        if (name.toLowerCase().includes(query)) {
-          matchingWorkers.push({ name, sessions });
-        }
-      });
-      
-      if (matchingWorkers.length === 0) {
-        resultsContainer.innerHTML = `<p class="text-slate-400 text-center py-2 text-sm">Tidak ditemukan</p>`;
-        resultContainer.classList.add('hidden');
-        noResult.classList.add('hidden');
-        return;
-      }
-      
-      noResult.classList.add('hidden');
-      
-      resultsContainer.innerHTML = matchingWorkers.slice(0, 5).map(w => `
-        <button onclick="showWorkerJamDetail('${w.name.replace(/'/g, "\\'")}')" class="w-full text-left px-4 py-2 bg-slate-700/50 hover:bg-slate-600 rounded-lg text-white text-sm transition-all">
-          ${w.name}
-        </button>
-      `).join('');
+      showToast('📷 Membuka kamera...');
+      document.getElementById('camera-input').click();
     });
 
-    function showWorkerJamDetail(workerName) {
-      const resultsContainer = document.getElementById('jam-search-results');
-      const resultContainer = document.getElementById('jam-result-container');
-      const noResult = document.getElementById('jam-no-result');
+    // Camera input handler
+    document.getElementById('camera-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
       
-      resultsContainer.innerHTML = '';
-      noResult.classList.add('hidden');
-      
-      const worker = workers.find(w => w.name === workerName);
-      const photoUrl = worker ? convertDriveLink(worker.photo) : '';
-      
-      const sessions = [];
-      currentRecapData.forEach(record => {
-        const workerData = record.workers.find(w => w.name === workerName);
-        if (workerData) {
-          sessions.push({ jam: record.jam, status: workerData.status });
-        }
-      });
-      
-      const photoContainer = document.getElementById('jam-worker-photo');
-      if (photoUrl && photoUrl.startsWith('http')) {
-        photoContainer.innerHTML = `<img src="${photoUrl}" alt="${workerName}" class="w-16 h-16 rounded-full object-cover" onerror="this.outerHTML='${workerName.charAt(0).toUpperCase()}'">`;
-      } else {
-        photoContainer.textContent = workerName.charAt(0).toUpperCase();
+      if (!file) {
+        console.log('❌ No file selected');
+        showToast('❌ Tidak ada file yang dipilih');
+        return;
       }
       
-      document.getElementById('jam-worker-name').textContent = workerName;
-      
-      const workSessions = [];
-      let currentStart = null;
-      
-      sessions.sort((a, b) => a.jam.localeCompare(b.jam));
-      
-      sessions.forEach(s => {
-        if (s.status === 'Start Work') {
-          currentStart = s.jam;
-        } else if (s.status === 'Finish Work' && currentStart) {
-          workSessions.push({ start: currentStart, finish: s.jam });
-          currentStart = null;
-        }
-      });
-      
-      const sessionsContainer = document.getElementById('jam-sessions');
-      if (workSessions.length === 0) {
-        sessionsContainer.innerHTML = `<p class="text-slate-400 text-sm text-center">Tidak ada sesi kerja lengkap (Start - Finish)</p>`;
-      } else {
-        sessionsContainer.innerHTML = workSessions.map((s, i) => {
-          const duration = calculateDuration(s.start, s.finish);
-          return `
-            <div class="flex justify-between items-center bg-slate-700/50 rounded-lg px-4 py-2">
-              <span class="text-slate-300 text-sm">Sesi ${i + 1}</span>
-              <span class="text-white font-medium">${s.start} - ${s.finish}</span>
-              <span class="text-cyan-400 font-semibold">${duration}</span>
-            </div>
-          `;
-        }).join('');
-      }
-      
-      let totalMinutes = 0;
-      workSessions.forEach(s => {
-        totalMinutes += calculateMinutes(s.start, s.finish);
-      });
-      
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
-      document.getElementById('jam-total').textContent = `${hours} Jam ${minutes} Menit`;
-      
-      resultContainer.classList.remove('hidden');
-    }
-
-    function calculateDuration(start, finish) {
-      const minutes = calculateMinutes(start, finish);
-      const h = Math.floor(minutes / 60);
-      const m = minutes % 60;
-      if (h === 0) return `${m} Menit`;
-      return `${h}j ${m}m`;
-    }
-
-    function calculateMinutes(start, finish) {
-      const [sh, sm] = start.split(':').map(Number);
-      const [fh, fm] = finish.split(':').map(Number);
-      return (fh * 60 + fm) - (sh * 60 + sm);
-    }
-
-    async function renderCalendar() {
-      const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      const year = currentCalendarDate.getFullYear();
-      const month = currentCalendarDate.getMonth();
-      
-      document.getElementById('calendar-month').textContent = `${monthNames[month]} ${year}`;
-      
-      const firstDay = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const container = document.getElementById('calendar-days');
-      const loadingEl = document.getElementById('calendar-loading');
-      
-      container.innerHTML = '';
-      
-      loadingEl.classList.remove('hidden');
-      let monthData = {};
+      console.log('✅ File selected:', file.name, file.type, file.size);
+      showToast('⏳ Memproses foto & menambahkan watermark...');
       
       try {
-        const cacheKey = `${month + 1}-${year}`;
-        if (calendarDataCache[cacheKey]) {
-          monthData = calendarDataCache[cacheKey];
-        } else {
-          const response = await fetch(`${scriptUrl}?action=getMonthData&month=${month + 1}&year=${year}`);
-          const result = await response.json();
-          if (result.success) {
-            monthData = result.data || {};
-            calendarDataCache[cacheKey] = monthData;
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load month data:', error);
-      }
-      
-      loadingEl.classList.add('hidden');
-      
-      for (let i = 0; i < firstDay; i++) {
-        container.appendChild(document.createElement('div'));
-      }
-      
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        const dateStr = formatDateForSearch(date);
-        const isToday = new Date().toDateString() === date.toDateString();
-        const dataCount = monthData[day] || 0;
-        const hasData = dataCount > 0;
+        const reader = new FileReader();
         
-        const dayCell = document.createElement('button');
-        dayCell.className = `calendar-day flex flex-col items-center justify-center rounded-lg p-1 ${isToday ? 'ring-2 ring-orange-500' : ''} ${hasData ? 'has-data' : 'bg-slate-700/30 hover:bg-slate-600/50'}`;
-        dayCell.innerHTML = `
-          <span class="text-white text-sm font-semibold">${day}</span>
-          ${hasData ? `<span class="text-[9px] text-white/80">${dataCount} data</span>` : ''}
-        `;
-        dayCell.onclick = () => showRecapForDate(dateStr, 'calendar');
-        container.appendChild(dayCell);
-      }
-    }
-
-    function prevMonth() { 
-      currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1); 
-      renderCalendar(); 
-    }
-    
-    function nextMonth() { 
-      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); 
-      renderCalendar(); 
-    }
-
-    async function loadPhotoFolders() {
-      const loading = document.getElementById('gallery-loading');
-      const folders = document.getElementById('gallery-folders');
-      const empty = document.getElementById('gallery-empty');
-
-      loading.classList.remove('hidden');
-      folders.classList.add('hidden');
-      empty.classList.add('hidden');
-
-      try {
-        const response = await fetch(`${scriptUrl}?action=getPhotoFolders`);
-        const result = await response.json();
-        loading.classList.add('hidden');
-
-        if (result.success && result.folders && result.folders.length > 0) {
-          renderPhotoFolders(result.folders);
-          folders.classList.remove('hidden');
-        } else {
-          empty.classList.remove('hidden');
-        }
-      } catch (error) {
-        loading.innerHTML = `<p class="text-red-400 text-sm">Error: ${error.message}</p>`;
-      }
-    }
-
-    function renderPhotoFolders(folderDates) {
-      const container = document.getElementById('gallery-folders');
-      container.innerHTML = '';
-
-      folderDates.forEach(date => {
-        const folder = document.createElement('button');
-        folder.className = 'gallery-folder bg-white rounded-xl p-3 text-center border border-slate-200 shadow-md';
-        folder.onclick = () => loadPhotosForDate(date);
-        folder.innerHTML = `<div class="text-2xl mb-1">📂</div><p class="text-slate-800 font-semibold text-xs">${date}</p>`;
-        container.appendChild(folder);
-      });
-    }
-
-    async function loadPhotosForDate(date) {
-      showPage('page-photo-detail');
-      document.getElementById('photo-folder-date').textContent = date;
-      
-      const grid = document.getElementById('photo-grid');
-      const empty = document.getElementById('photos-empty');
-      
-      grid.innerHTML = '<div class="col-span-full text-center py-8"><div class="inline-block w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>';
-      empty.classList.add('hidden');
-
-      try {
-        const response = await fetch(`${scriptUrl}?action=getPhotos&date=${encodeURIComponent(date)}`);
-        const result = await response.json();
-
-        if (result.success && result.photos && result.photos.length > 0) {
-          grid.innerHTML = '';
-          galleryPhotos = result.photos;
-          result.photos.forEach((photo, index) => {
-            const photoEl = document.createElement('div');
-            photoEl.className = 'relative rounded-lg overflow-hidden bg-slate-800 cursor-pointer hover:opacity-90 transition-opacity';
-            photoEl.onclick = () => openGalleryFullscreen(index);
-            photoEl.innerHTML = `<img src="${photo.url}" alt="${photo.name}" class="w-full aspect-square object-cover" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23334155%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2212%22>No Image</text></svg>'"><div class="absolute bottom-0 left-0 right-0 bg-black/60 p-1 text-center"><span class="text-white text-xs">${photo.name}</span></div>`;
-            grid.appendChild(photoEl);
-          });
-        } else {
-          grid.innerHTML = '';
-          galleryPhotos = [];
-          empty.classList.remove('hidden');
-        }
-      } catch (error) {
-        grid.innerHTML = `<p class="col-span-full text-center text-red-400 text-sm">Error: ${error.message}</p>`;
-      }
-    }
-
-    function saveScriptUrl() {
-      const input = document.getElementById('script-url-input');
-      const url = input.value.trim();
-      
-      if (url && url.startsWith('https://script.google.com/')) {
-        scriptUrl = url;
-        localStorage.setItem('appsScriptUrl', url);
-        updateScriptUrlStatus();
-        showNotification('URL tersimpan!');
-      } else {
-        showNotification('URL tidak valid!', true);
-      }
-    }
-
-    function updateScriptUrlStatus() {
-      const status = document.getElementById('script-url-status');
-      status.innerHTML = scriptUrl ? '<span class="text-green-400">✓ URL tersimpan</span>' : '<span class="text-slate-400">Belum ada URL</span>';
-    }
-
-    function copyScript() {
-      navigator.clipboard.writeText(document.getElementById('apps-script-code').textContent).then(() => showNotification('Kode di-copy!'));
-    }
-
-    function showNotification(message, isError = false) {
-      const notif = document.getElementById('notification');
-      const text = document.getElementById('notification-text');
-      text.textContent = message;
-      notif.querySelector('div').className = `${isError ? 'bg-red-500' : 'bg-green-500'} text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 text-sm`;
-      notif.classList.remove('hidden');
-      setTimeout(() => notif.classList.add('hidden'), 3000);
-    }
-
-    // Gallery Fullscreen Functions
-    function openGalleryFullscreen(index) {
-      currentGalleryIndex = index;
-      const viewer = document.getElementById('fullscreen-viewer');
-      const image = document.getElementById('fullscreen-image');
-      const counter = document.getElementById('photo-counter');
-      
-      image.src = galleryPhotos[index].url;
-      counter.textContent = `${index + 1} / ${galleryPhotos.length}`;
-      viewer.classList.remove('hidden');
-      viewer.dataset.mode = 'gallery';
-    }
-
-    function navigateGalleryPhoto(direction, event) {
-      event.stopPropagation();
-      currentGalleryIndex += direction;
-      
-      if (currentGalleryIndex < 0) currentGalleryIndex = galleryPhotos.length - 1;
-      if (currentGalleryIndex >= galleryPhotos.length) currentGalleryIndex = 0;
-      
-      document.getElementById('fullscreen-image').src = galleryPhotos[currentGalleryIndex].url;
-      document.getElementById('photo-counter').textContent = `${currentGalleryIndex + 1} / ${galleryPhotos.length}`;
-    }
-
-    // PDF Download Function
-    async function downloadRecapPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-      
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 15;
-      
-      // Header - Logo and Company Name
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(0, 0, 0);
-      
-      // Logo placeholder (black circle with A)
-      doc.setFillColor(0, 0, 0);
-      doc.circle(margin + 8, 15, 8, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(12);
-      doc.text('A', margin + 5.5, 18);
-      
-      // Company name next to logo
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Archipelago Film Service', margin + 20, 17);
-      
-      // Title - Recap Absensi Daily Worker (centered)
-      doc.setFontSize(18);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Recap Absensi Daily Worker', pageWidth / 2, 32, { align: 'center' });
-      
-      // Date (centered) - format to Indonesian
-      const dateParts = currentRecapDate.split('/');
-      const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      const formattedDate = `${dateParts[0]} ${monthNames[parseInt(dateParts[1]) - 1]} ${dateParts[2]}`;
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text(formattedDate, pageWidth / 2, 40, { align: 'center' });
-      
-      // Prepare table data
-      const timeColumns = [];
-      const workersMap = new Map();
-      
-      currentRecapData.forEach(record => {
-        if (!timeColumns.includes(record.jam)) {
-          timeColumns.push(record.jam);
-        }
-        record.workers.forEach(w => {
-          if (!workersMap.has(w.name)) {
-            workersMap.set(w.name, {});
-          }
-          workersMap.get(w.name)[record.jam] = w.status;
-        });
-      });
-      
-      // Calculate work hours for each worker
-      function calculateWorkerHours(statuses) {
-        const sessions = [];
-        const sortedTimes = Object.keys(statuses).sort();
-        let currentStart = null;
-        
-        sortedTimes.forEach(jam => {
-          const status = statuses[jam];
-          if (status === 'Start Work') {
-            currentStart = jam;
-          } else if (status === 'Finish Work' && currentStart) {
-            sessions.push({ start: currentStart, finish: jam });
-            currentStart = null;
-          }
-        });
-        
-        let totalMinutes = 0;
-        sessions.forEach(s => {
-          const [sh, sm] = s.start.split(':').map(Number);
-          const [fh, fm] = s.finish.split(':').map(Number);
-          totalMinutes += (fh * 60 + fm) - (sh * 60 + sm);
-        });
-        
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        return `${hours} JAM ${minutes} MENIT`;
-      }
-      
-      // Build table headers
-      const headers = [['Nama Pekerja', ...timeColumns, 'Total Jam Kerja']];
-      
-      // Build table body with colored text
-      const body = [];
-      const cellStyles = [];
-      
-      let rowIndex = 0;
-      workersMap.forEach((statuses, workerName) => {
-        const row = [workerName];
-        const rowStyles = [{ textColor: [0, 0, 0] }]; // Name is black
-        
-        timeColumns.forEach(jam => {
-          const status = statuses[jam] || '-';
-          row.push(status);
-          
-          // Set text color based on status
-          let textColor = [0, 0, 0]; // default black
-          if (status === 'Start Work') textColor = [34, 197, 94]; // green
-          else if (status === 'Finish Work') textColor = [59, 130, 246]; // blue
-          else if (status === 'Sakit') textColor = [249, 115, 22]; // orange
-          else if (status === 'Standby') textColor = [168, 85, 247]; // purple
-          else if (status === '-') textColor = [100, 116, 139]; // gray
-          
-          rowStyles.push({ textColor: textColor });
-        });
-        
-        // Add total hours
-        const totalHours = calculateWorkerHours(statuses);
-        row.push(totalHours);
-        rowStyles.push({ textColor: [0, 0, 0], fontStyle: 'bold' });
-        
-        body.push(row);
-        cellStyles.push(rowStyles);
-        rowIndex++;
-      });
-      
-      // Generate table with autoTable
-      doc.autoTable({
-        head: headers,
-        body: body,
-        startY: 48,
-        margin: { left: margin, right: margin },
-        styles: {
-          fontSize: 8,
-          cellPadding: 2,
-          halign: 'center',
-          valign: 'middle',
-          lineColor: [100, 116, 139],
-          lineWidth: 0.1
-        },
-        headStyles: {
-          fillColor: [30, 41, 59],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-          fontSize: 8
-        },
-        columnStyles: {
-          0: { halign: 'left', cellWidth: 40 }
-        },
-        alternateRowStyles: {
-          fillColor: [241, 245, 249]
-        },
-        didParseCell: function(data) {
-          if (data.section === 'body' && cellStyles[data.row]) {
-            const style = cellStyles[data.row][data.column.index];
-            if (style) {
-              data.cell.styles.textColor = style.textColor;
-              if (style.fontStyle) {
-                data.cell.styles.fontStyle = style.fontStyle;
-              }
+        reader.onload = async (event) => {
+          try {
+            console.log('📸 File loaded, size:', event.target.result.length);
+            console.log('🖼️ Adding watermark...');
+            
+            const originalImage = event.target.result;
+            
+            // Add watermark
+            const watermarkedImage = await addWatermarkToPhoto(originalImage);
+            
+            if (!watermarkedImage) {
+              console.error('❌ Watermark returned null');
+              showToast('❌ Gagal menambahkan watermark');
+              return;
             }
+            
+            console.log('✅ Watermark added successfully, size:', watermarkedImage.length);
+            
+            // Store photo
+            attendancePhotos.push(watermarkedImage);
+            console.log('📦 Total photos:', attendancePhotos.length);
+            
+            // Re-render gallery
+            renderPhotoGallery();
+            console.log('🎨 Gallery rendered');
+            
+            showToast(`✅ Foto ${attendancePhotos.length}/10 berhasil ditambahkan!`);
+          } catch (innerError) {
+            console.error('❌ Error in onload handler:', innerError);
+            showToast('❌ Gagal menambahkan watermark: ' + innerError.message);
           }
-        }
-      });
+        };
+        
+        reader.onerror = (error) => {
+          console.error('❌ FileReader error:', error);
+          showToast('❌ Gagal membaca file foto: ' + error);
+        };
+        
+        console.log('📖 Starting to read file...');
+        reader.readAsDataURL(file);
+        
+      } catch (error) {
+        console.error('❌ Error processing photo:', error);
+        showToast('❌ Gagal memproses foto: ' + error.message);
+      }
       
-      // Save PDF
-      const fileName = `Recap_Absensi_${currentRecapDate.replace(/\//g, '-')}.pdf`;
-      doc.save(fileName);
-      showNotification('PDF berhasil didownload!');
+      // Reset input for multiple captures
+      e.target.value = '';
+    });
+
+    // Lightbox event listeners
+    document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+    document.getElementById('lightbox-prev').addEventListener('click', () => navigateLightbox('prev'));
+    document.getElementById('lightbox-next').addEventListener('click', () => navigateLightbox('next'));
+    
+    // Close lightbox on background click
+    document.getElementById('lightbox-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'lightbox-modal') {
+        closeLightbox();
+      }
+    });
+
+    // Keyboard navigation for lightbox
+    document.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('lightbox-modal');
+      if (!modal.classList.contains('active')) return;
+      
+      if (e.key === 'Escape') {
+        closeLightbox();
+      } else if (e.key === 'ArrowLeft') {
+        navigateLightbox('prev');
+      } else if (e.key === 'ArrowRight') {
+        navigateLightbox('next');
+      }
+    });
+
+    // ========== KIRIM ABSEN FUNCTION ==========
+    
+    // Compress image to reduce file size while maintaining high resolution
+    function compressImage(dataUrl, quality = 0.85) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = dataUrl;
+      });
     }
 
-    async function onConfigChange(newConfig) {
-      config = { ...config, ...newConfig };
+    // Convert base64 to blob for better handling
+    function base64ToBlob(base64) {
+      const parts = base64.split(';base64,');
+      const contentType = parts[0].split(':')[1];
+      const raw = window.atob(parts[1]);
+      const rawLength = raw.length;
+      const uInt8Array = new Uint8Array(rawLength);
+      
+      for (let i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+      
+      return new Blob([uInt8Array], { type: contentType });
+    }
+
+    // Download foto ke device (Android/Laptop) atau Share Sheet (iOS)
+    async function downloadPhotos(photos) {
+      try {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        if (isIOS && navigator.share) {
+          // iOS: Gunakan Share Sheet
+          try {
+            const files = await Promise.all(photos.map(async (photo, index) => {
+              const blob = base64ToBlob(photo);
+              return new File([blob], `Absen_${index + 1}.jpg`, { type: 'image/jpeg' });
+            }));
+            
+            await navigator.share({
+              files: files,
+              title: 'Foto Absensi',
+              text: 'Simpan foto absensi'
+            });
+            
+            showToast('✅ Foto siap disimpan dari Share Sheet!');
+          } catch (error) {
+            console.warn('Share failed, trying direct download:', error);
+            downloadPhotosDirectly(photos);
+          }
+        } else {
+          // Android/Laptop: Download langsung
+          downloadPhotosDirectly(photos);
+        }
+      } catch (error) {
+        console.warn('Download blocked by browser:', error);
+        showToast('⚠️ Download diblokir. Foto tetap tersimpan di Google Drive');
+      }
+    }
+
+    // Download foto langsung ke device
+    function downloadPhotosDirectly(photos) {
+      try {
+        photos.forEach((photo, index) => {
+          const link = document.createElement('a');
+          link.href = photo;
+          link.download = `Absen_${index + 1}.jpg`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+        
+        showToast(`✅ ${photos.length} foto berhasil didownload!`);
+      } catch (error) {
+        console.warn('Direct download failed:', error);
+        showToast('⚠️ Download diblokir. Foto tetap tersimpan di Google Drive');
+      }
+    }
+
+    // Kirim absen ke Google Sheets & Drive
+    async function kirimAbsen() {
+      // Validasi: Harus ada minimal 1 pekerja yang dipilih
+      if (Object.keys(selectedCards).length === 0) {
+        showToast('❌ Pilih minimal 1 pekerja terlebih dahulu!');
+        return;
+      }
+      
+      const statusDiv = document.getElementById('send-status');
+      statusDiv.className = 'mt-4 p-4 rounded-lg bg-blue-500/20 border border-blue-500';
+      statusDiv.innerHTML = '<p class="text-blue-400 font-semibold">⏳ Mengirim data absensi...</p>';
+      statusDiv.classList.remove('hidden');
+      
+      try {
+        // Prepare attendance data
+        const now = new Date();
+        const tanggal = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+        const jam = `${String(now.getHours()).padStart(2, '0')}.${String(now.getMinutes()).padStart(2, '0')}.${String(now.getSeconds()).padStart(2, '0')}`;
+        
+        // Build worker status data
+        const workerStatuses = workers.map(worker => {
+          const status = selectedCards[worker.id];
+          let statusText = 'Belum absen';
+          let color = 'red';
+          
+          if (status === 'start') {
+            statusText = 'Start Work';
+            color = 'green';
+          } else if (status === 'finish') {
+            statusText = 'Finish Work';
+            color = 'blue';
+          } else if (status === 'break') {
+            statusText = 'Istirahat';
+            color = 'orange';
+          } else if (status === 'resume') {
+            statusText = 'Standby';
+            color = 'purple';
+          }
+          
+          return {
+            name: worker.name,
+            status: statusText,
+            color: color
+          };
+        });
+        
+        // Compress photos
+        statusDiv.innerHTML = '<p class="text-blue-400 font-semibold">⏳ Mengkompresi foto...</p>';
+        const compressedPhotos = await Promise.all(
+          attendancePhotos.map(photo => compressImage(photo, 0.85))
+        );
+        
+        // Prepare data for Apps Script
+        const requestData = {
+          tanggal: tanggal,
+          jam: jam,
+          workers: workerStatuses,
+          photos: compressedPhotos
+        };
+        
+        statusDiv.innerHTML = '<p class="text-blue-400 font-semibold">⏳ Mengirim ke server...</p>';
+        
+        // Send to Apps Script (parallel processing)
+        const sendPromise = fetch(`${appsScriptUrl}?action=submitAttendance`, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData)
+        });
+        
+        // Download photos to device (parallel)
+        const downloadPromise = downloadPhotos(attendancePhotos);
+        
+        // Wait for both operations
+        await Promise.all([sendPromise, downloadPromise]);
+        
+        // Note: With no-cors, we can't read the response, so we assume success
+        statusDiv.className = 'mt-4 p-4 rounded-lg bg-green-500/20 border border-green-500';
+        statusDiv.innerHTML = `
+          <p class="text-green-400 font-semibold mb-2">✅ Absensi berhasil dikirim!</p>
+          <p class="text-sm text-gray-300">Data: ${workerStatuses.length} pekerja</p>
+          <p class="text-sm text-gray-300">Foto: ${attendancePhotos.length} foto</p>
+        `;
+        
+        showToast('✅ Absensi berhasil dikirim!');
+        
+        // Auto-hide status after 5 seconds
+        setTimeout(() => {
+          statusDiv.classList.add('hidden');
+        }, 5000);
+        
+      } catch (error) {
+        console.error('Error sending attendance:', error);
+        statusDiv.className = 'mt-4 p-4 rounded-lg bg-red-500/20 border border-red-500';
+        statusDiv.innerHTML = `
+          <p class="text-red-400 font-semibold mb-2">❌ Gagal mengirim absensi!</p>
+          <p class="text-sm text-gray-300">${error.message}</p>
+        `;
+        
+        showToast('❌ Gagal mengirim absensi');
+      }
+    }
+
+    // Event listener untuk tombol Kirim Absen
+    document.getElementById('btn-kirim-absen').addEventListener('click', kirimAbsen);
+
+    // Element SDK Implementation
+    async function onConfigChange(config) {
       document.getElementById('header-title').textContent = config.app_title || defaultConfig.app_title;
-      document.getElementById('login-company-name').textContent = config.company_name || defaultConfig.company_name;
-      updateAllLogos();
     }
 
     function mapToCapabilities(config) {
-      return { recolorables: [], borderables: [], fontEditable: undefined, fontSizeable: undefined };
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
     }
 
     function mapToEditPanelValues(config) {
       return new Map([
         ['app_title', config.app_title || defaultConfig.app_title],
-        ['company_name', config.company_name || defaultConfig.company_name],
-        ['logo_url', config.logo_url || defaultConfig.logo_url]
+        ['login_username', config.login_username || defaultConfig.login_username],
+        ['login_password', config.login_password || defaultConfig.login_password]
       ]);
     }
 
     if (window.elementSdk) {
-      window.elementSdk.init({ defaultConfig, onConfigChange, mapToCapabilities, mapToEditPanelValues });
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
     }
-
-    updateDateTime();
-    requestLocationPermission();
-    updateAllLogos();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b8ccca83749c1c8',t:'MTc2NzU1MTM0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9baa33b2b0971edc',t:'MTc2Nzg1OTY1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
